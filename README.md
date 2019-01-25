@@ -69,11 +69,11 @@ View full [docs](docs/visual_regression.md) -->
 
 ## Helpful Links
 
-### Puppeteer API
+**Puppeteer API**
 - https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md
 
-### Deploy files to S3 bucket with AWS
+**Deploy files to S3 bucket with AWS**
 - https://www.npmjs.com/package/aws-sdk
 
-### Jest image snapshot, for visual regression
+**Jest image snapshot, for visual regression**
 - https://www.npmjs.com/package/jest-image-snapshot
