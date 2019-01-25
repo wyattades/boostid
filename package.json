@@ -1,7 +1,10 @@
 {
   "name": "boostid",
   "version": "0.0.1",
-  "scripts": {},
+  "scripts": {
+    "docker:build": "docker build -t wades/boostid$() ./docker",
+    "docker:deploy": "docker push wades/boostid:$()"
+  },
   "dependencies": {
     "aws-sdk": "^2.394.0",
     "inquirer": "^6.2.1",

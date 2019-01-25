@@ -25,18 +25,20 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 # Cache npm packages:
-COPY package*.json /app/
-WORKDIR /app
-RUN npm install
+# COPY package*.json /app/
+# WORKDIR /home/boostid
+# RUN npm install
 
 # Jest doesn't work in root directory so we move down
-COPY . /app/
+# COPY . /app/
 
 # Add user so we don't need --no-sandbox.
-RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
-    && mkdir -p /home/pptruser/Downloads \
-    && chown -R pptruser:pptruser /home/pptruser \
-    && chown -R pptruser:pptruser /app/node_modules
+RUN groupadd -r boostid && useradd -r -g boostid -G audio,video boostid \
+    && mkdir -p /home/boostid/Downloads \
+    && chown -R boostid:boostid /home/boostid
+    # && chown -R boostid:boostid /app/node_modules
+
+WORKDIR /home/boostid
 
 # Run everything after as non-privileged user.
-USER pptruser
+USER boostid
