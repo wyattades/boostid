@@ -3,7 +3,7 @@
 const yargs = require('yargs/yargs');
 const packageJson = require('../package.json');
 const { run } = require('../lib/utils');
-const { spawn } = require('child_process');
+// const { spawn } = require('child_process');
 
 const runModule = (path) => (argv) => require(path)(argv)
 .catch((err) => {

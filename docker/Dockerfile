@@ -6,6 +6,9 @@ FROM node:10.15.0-slim@sha256:bb4a5a0bdc9886b180d52b556b1e3f3f624bc8c13d50bd3edc
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4
 
+# Install git binary
+RUN apt-get -y install git
+
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
 # installs, work.
@@ -35,10 +38,13 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 # Add user so we don't need --no-sandbox.
 RUN groupadd -r boostid && useradd -r -g boostid -G audio,video boostid \
     && mkdir -p /home/boostid/Downloads \
+    && mkdir -p /home/boostid/app \
     && chown -R boostid:boostid /home/boostid
     # && chown -R boostid:boostid /app/node_modules
 
-WORKDIR /home/boostid
+WORKDIR /home/boostid/app
 
 # Run everything after as non-privileged user.
 USER boostid
+
+CMD ['/bin/bash']
