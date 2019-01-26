@@ -5,6 +5,6 @@ module.exports = {
   testRegex: '/__tests__/.*\\.js$',
   globalSetup: 'jest-environment-puppeteer/setup',
   globalTeardown: 'jest-environment-puppeteer/teardown',
-  testEnvironment: 'jest-environment-puppeteer',
+  testEnvironment: path.resolve(__dirname, 'test-environment.js'),
   reporters: [ 'default', path.resolve(__dirname, 'image-reporter.js') ],
 };

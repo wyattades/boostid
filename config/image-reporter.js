@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { loadConfig } = require('../lib/config');
+const logger = require('../lib/log');
 
 
 class ImageReporter {
@@ -9,6 +10,8 @@ class ImageReporter {
     this._options = options;
 
     if (process.env.AWS_ACCESS_KEY_ID && process.env.VISUALREG_BUCKET) {
+      logger.info('Setting up AWS S3 for visual regression image hosting...');
+
       require('aws-sdk/global');
       const S3 = require('aws-sdk/clients/s3');
       const config = loadConfig();

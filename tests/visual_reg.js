@@ -1,6 +1,3 @@
-const { toMatchImageSnapshot } = require('jest-image-snapshot');
-expect.extend({ toMatchImageSnapshot });
-
 
 let config;
 exports.init = (_config) => {
