@@ -2,12 +2,12 @@
 
 const yargs = require('yargs/yargs');
 const packageJson = require('../package.json');
-const { run } = require('../lib/utils');
+const { run, logger } = require('../lib/utils');
 // const { spawn } = require('child_process');
 
 const runModule = (path) => (argv) => require(path)(argv)
 .catch((err) => {
-  console.error('\x1b[31m%s\x1b[0m', err);
+  logger.error(err);
   process.exit(1);
 });
 
@@ -17,11 +17,9 @@ const runModule = (path) => (argv) => require(path)(argv)
 //   });
 // };
 const runScript = (path) => (argv) => run([ path, ...argv._.slice(1) ], false)
-.then(([ err, msg ]) => {
-  if (err) {
-    console.error('\x1b[31m%s\x1b[0m', err);
-    process.exit(1);
-  }
+.catch((err) => {
+  logger.error(err);
+  process.exit(1);
 });
 
 const commands = [{
@@ -35,14 +33,14 @@ const commands = [{
 }, {
   command: 'test [type]',
   desc: 'Test stuff',
-  builder: (yargs) => yargs
-    .completion()
-    .choices('type', ['visualreg', 'behat', 'all'])
-    .option('cmd1-option', {
-      desc: 'command 1 option 1',
-      type: 'string',
-      // global: true // ???
-    }),
+  builder: (_yargs) => _yargs
+  .completion()
+  .choices('type', ['visualreg', 'behat', 'all'])
+  .option('cmd1-option', {
+    desc: 'command 1 option 1',
+    type: 'string',
+    // global: true // ???
+  }),
   handler: runModule('../lib/test'),
 }, {
   command: 'update',
@@ -71,7 +69,7 @@ const program = (args) => {
 
   // config file
   .config('config', (configPath) => {
-    return JSON.parse(require('fs').readFileSync(configPath, 'utf-8'))
+    return JSON.parse(require('fs').readFileSync(configPath, 'utf-8'));
   })
   .alias('c', 'config');
 
