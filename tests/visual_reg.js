@@ -2,15 +2,22 @@ const { toMatchImageSnapshot } = require('jest-image-snapshot');
 expect.extend({ toMatchImageSnapshot });
 
 
-const config = require('../boostid.config.js');
-// Validate config
-if (!config.multidev) config.multidev = 'updates';
-for (const _page in config.pages) {
-  if (!_page.viewPorts) _page.viewPorts = [{ width: 1200, height: 800 }];
-}
+let config;
+exports.init = (_config) => {
+  config = _config;
+
+  // config defaults
+  if (!config.multidev) config.multidev = 'updates';
+  for (const _page in config.pages) {
+    if (!_page.viewPorts) _page.viewPorts = [{ width: 1200, height: 800 }];
+  }
+};
 
 
 const generateScreenshots = (base) => {
+
+  if (!config)
+    throw 'Provide a config object to the "init" function before any other tests';
 
   test.each(config.pages)('Goto page ', async (_page) => {
 
@@ -28,6 +35,6 @@ const generateScreenshots = (base) => {
 
 };
 
-exports.visualRegOnUpdates = generateScreenshots(`https://${config.multidev}-${config.name}.pantheonsite.io`);
+exports.visualRegOnUpdates = () => generateScreenshots(`https://${config.multidev}-${config.name}.pantheonsite.io`);
 
-exports.visualRegOnLive = generateScreenshots(config.liveSite);
+exports.visualRegOnLive = () => generateScreenshots(config.liveSite);

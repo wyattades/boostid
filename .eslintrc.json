@@ -3,7 +3,13 @@
   "extends": "airbnb",
   "plugins": ["react", "jsx-a11y", "import"],
   "env": {
-    "node": true
+    "node": true,
+    "jest": true
+  },
+  "globals": {
+    "page": true,
+    "browser": true,
+    "context": true
   },
   "rules": {
     "no-unused-prop-types": 0,
