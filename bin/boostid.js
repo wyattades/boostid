@@ -16,7 +16,7 @@ const runModule = (path) => (argv) => require(path)(argv)
 //     stdio: 'inherit',
 //   });
 // };
-const runScript = (path) => (argv) => run([ path, ...argv._.slice(1) ], false)
+const runScript = (path) => (argv) => run([ path, ...argv._.slice(1) ])
 .catch((err) => {
   logger.error(err);
   process.exit(1);

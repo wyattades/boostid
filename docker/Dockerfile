@@ -7,7 +7,7 @@ FROM node:10.15.0-slim@sha256:bb4a5a0bdc9886b180d52b556b1e3f3f624bc8c13d50bd3edc
 RUN apt-get update && apt-get install -yq libgconf-2-4
 
 # Install git binary
-RUN apt-get -y install git
+RUN apt-get install -y git
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
 #     browser.launch({executablePath: 'google-chrome-unstable'})
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+# ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
 
 # Cache npm packages:
 # COPY package*.json /app/
@@ -46,5 +46,3 @@ WORKDIR /home/boostid/app
 
 # Run everything after as non-privileged user.
 USER boostid
-
-CMD ['/bin/bash']
