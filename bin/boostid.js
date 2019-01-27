@@ -4,6 +4,8 @@ const yargs = require('yargs/yargs');
 const packageJson = require('../package.json');
 const { run } = require('../lib/utils');
 const logger = require('../lib/log');
+const config = require('../lib/config');
+
 
 const runModule = (path) => (argv) => require(path)(argv)
 .catch((err) => {
@@ -36,9 +38,10 @@ const commands = [{
   builder: (_yargs) => _yargs
   .completion()
   .choices('type', ['visualreg', 'behat', 'all'])
-  .option('cmd1-option', {
-    desc: 'command 1 option 1',
+  .option('dev-boostid', {
+    desc: 'Use the local boostid repo',
     type: 'string',
+    requiresArg: true,
     // global: true // ???
   }),
   handler: runModule('../lib/test'),
@@ -53,6 +56,7 @@ const program = (args) => {
   const parser = yargs(args)
   .scriptName(packageJson.name)
   .usage('Command suite for Rootid development and testing\n\nUsage: $0 <command> [options]')
+  .wrap(100)
   .strict(true)
   .demandCommand(1, '')
   .completion()
@@ -68,10 +72,17 @@ const program = (args) => {
   })
 
   // config file
-  .config('config', (configPath) => {
-    return JSON.parse(require('fs').readFileSync(configPath, 'utf-8'));
-  })
-  .alias('c', 'config');
+  .option('config', {
+    desc: 'Path to custom config file',
+    type: 'string',
+    requiresArg: true,
+    default: 'boostid.config.js',
+    alias: 'c',
+    coerce: (filename) => {
+      config.setFilename(filename);
+      return filename;
+    },
+  });
 
   // commands
   for (const cmd of commands) parser.command(cmd);

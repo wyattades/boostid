@@ -22,6 +22,10 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
     && apt-get purge --auto-remove -y curl \
     && rm -rf /src/*.deb
 
+# It's a good idea to use dumb-init to help prevent zombie chrome processes.
+ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 /usr/local/bin/dumb-init
+RUN chmod +x /usr/local/bin/dumb-init
+
 # Uncomment to skip the chromium download when installing puppeteer. If you do,
 # you'll need to launch puppeteer with:
 #     browser.launch({executablePath: 'google-chrome-unstable'})
@@ -33,16 +37,16 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
 # RUN npm install
 
 # Jest doesn't work in root directory so we move down
-# COPY . /app/
+WORKDIR /app/
 
 # Add user so we don't need --no-sandbox.
-RUN groupadd -r boostid && useradd -r -g boostid -G audio,video boostid \
-    && mkdir -p /home/boostid/Downloads \
-    && mkdir -p /home/boostid/app \
-    && chown -R boostid:boostid /home/boostid
+# RUN groupadd -r boostid && useradd -r -g boostid -G audio,video boostid \
+#     && mkdir -p /home/boostid/Downloads \
+#     && mkdir -p /home/boostid/app \
+#     && chown -R boostid:boostid /home/boostid
     # && chown -R boostid:boostid /app/node_modules
 
-WORKDIR /home/boostid/app
+# WORKDIR /home/boostid/app
 
-# Run everything after as non-privileged user.
-USER boostid
+# # Run everything after as non-privileged user.
+# USER pptruser

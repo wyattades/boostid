@@ -6,6 +6,7 @@
 
 1. Install [Node.js](https://nodejs.org) version 8 and up
 2. Install _Boostid_
+    (If you want to avoid installing Chrome locally for each project, add `export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true` to the __package.json__ `preinstall` script)
     ```bash
     npm install -S boostid
     ```
@@ -63,7 +64,7 @@ View full [docs](docs/visual_regression.md) -->
 4. Add the private ssh key to the CircleCI project settings
 
 <!-- ## Local Testing
-After editing your test files, you can avoid having to push to CircleCI by running them locally with `boostid test` -->
+After editing your test files, you can avoid having to push to CircleCI by running them locally with `boostid test`. -->
 
 ## Helpful Links
 

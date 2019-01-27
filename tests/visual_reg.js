@@ -1,11 +1,11 @@
-
 let config;
 exports.init = (_config) => {
   config = _config;
 
   // config defaults
   if (!config.multidev) config.multidev = 'updates';
-  for (const _page in config.pages) {
+  if (!config.pages) config.pages = [];
+  for (const _page of config.pages) {
     if (!_page.viewPorts) _page.viewPorts = [{ width: 1200, height: 800 }];
   }
 };
@@ -16,19 +16,24 @@ const generateScreenshots = (base) => {
   if (!config)
     throw 'Provide a config object to the "init" function before any other tests';
 
-  test.each(config.pages)('Goto page ', async (_page) => {
+  for (const { path, viewPorts } of config.pages) {
+    describe(`Goes to path: ${path}`, () => {
 
-    await page.goto(base + _page.path, { waitUntil: 'networkidle0' });
+      beforeAll(async () => {
+        await page.goto(base + path, { waitUntil: 'networkidle0' });
+      }, 15000);
 
-    for (const viewPort of _page.viewPorts) {
-      await page.setViewport(viewPort);
-      const image = await page.screenshot();
-      expect(image).toMatchImageSnapshot({
-        customSnapshotIdentifier: `${_page.path.replace('/', '_')}-${viewPort.width}x${viewPort.height}`,
-      });
-    }
-
-  }, 20000);
+      for (const viewPort of viewPorts) {
+        test(`On viewport ${viewPort.width}x${viewPort.height}`, async () => {
+          await page.setViewport(viewPort);
+          const image = await page.screenshot();
+          expect(image).toMatchImageSnapshot({
+            customSnapshotIdentifier: `${path.replace(/\//g, '_')}-${viewPort.width}x${viewPort.height}`,
+          });
+        });
+      }
+    });
+  }
 
 };
 
