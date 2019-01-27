@@ -89,7 +89,7 @@ class ImageReporter {
           const match = testResult.failureMessages[0].match(/__diff_output__\/([^\s]+-diff\.png)/);
           if (match) {
             diffFiles.push({
-              label: testResult.ancestorTitles.concat([testResult.title]).join(' <strong>|</strong> '),
+              label: testResult.ancestorTitles.concat([testResult.title]).join(' <strong>»</strong> '),
               filename: match[1],
             });
           }
