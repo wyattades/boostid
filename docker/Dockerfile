@@ -39,6 +39,8 @@ RUN chmod +x /usr/local/bin/dumb-init
 # Jest doesn't work in root directory so we move down
 WORKDIR /app/
 
+ENTRYPOINT ["dumb-init", "--"]
+
 # Add user so we don't need --no-sandbox.
 # RUN groupadd -r boostid && useradd -r -g boostid -G audio,video boostid \
 #     && mkdir -p /home/boostid/Downloads \

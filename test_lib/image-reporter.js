@@ -1,5 +1,5 @@
-const fs = require('fs');
-const { loadConfig } = require('../lib/config');
+const fs = require('fs-extra');
+const config = require('../lib/config');
 const logger = require('../lib/log');
 
 
@@ -10,37 +10,106 @@ class ImageReporter {
     this._options = options;
 
     if (process.env.AWS_ACCESS_KEY_ID && process.env.VISUALREG_BUCKET) {
+      const { name } = config.get();
+
       logger.info('Setting up AWS S3 for visual regression image hosting...');
 
       require('aws-sdk/global');
       const S3 = require('aws-sdk/clients/s3');
-      const config = loadConfig();
 
       this.s3 = new S3({ apiVersion: '2006-03-01' });
       this.bucket = process.env.VISUALREG_BUCKET;
-      this.name = config ? config.name : `unknown${Math.random().toFixed(10)}`;
+      this.name = name;
+      try {
+        this.containerId = fs.readFileSync('/etc/hostname', 'utf8').trim();
+      } catch (_) {
+        this.containerId = Math.floor(Math.random() * 1000000000).toString();
+      }
     }
   }
 
-  onTestResult(test, testResult, aggregateResults) {
-    if (this.s3 && testResult.numFailingTests && testResult.failureMessage.match(/different from snapshot/)) {
-      const files = fs.readdirSync('./tests/__image_snapshots__/__diff_output__/');
-      files.forEach((value) => {
-        const path = `${this.name}/${value}`;
-        const params = {
-          Body: fs.readFileSync(`./tests/__image_snapshots__/__diff_output__/${value}`),
-          Bucket: this.bucket,
-          Key: path,
-          ContentType: 'image/png',
-          ACL: 'public-read',
-        };
-        this.s3.putObject(params, (err) => {
-          if (err) {
-            console.log(err, err.stack);
-          } else {
-            console.log(`Diff file:\nhttps://${this.bucket}.s3.amazonaws.com/${path}`);
+  visualRegHtml(files) {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Visualreg: ${this.name}/${this.containerId}</title>
+  <style>
+    html {
+      font-family: Verdana, Geneva, sans-serif;
+    }
+    img {
+      width: 100%;
+      border: 2px solid black;
+    }
+  </style>
+</head>
+<body>
+  <h1>Visual Regression Results</h1>
+  <p><strong>Sitename:</strong> ${this.name}</p>
+  <p><strong>Container ID:</strong> ${this.containerId}</p>
+  <hr/>
+  ${files.map(({ filename, label }) => `
+  <div>
+    <p><strong>Test:</strong> ${label}</p>
+    <img src="./${filename}"/>
+  </div>`).join('<hr/>')}
+</body>
+</html>
+`;
+  }
+
+  putFile(filename, ContentType, contents) {
+    return new Promise((resolve, reject) => {
+      this.s3.putObject({
+        Body: contents,
+        Bucket: this.bucket,
+        Key: `${this.name}/${this.containerId}/${filename}`,
+        ContentType,
+        ACL: 'public-read',
+      }, (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+  }
+
+  onRunComplete(contexts, results) {
+    if (!this.s3) return;
+
+    const diffFiles = [];
+    // for each file
+    for (const { testResults } of results.testResults) {
+      // for each test in that file
+      for (const testResult of testResults) {
+        if (testResult.failureMessages && testResult.failureMessages.length) {
+          const match = testResult.failureMessages[0].match(/__diff_output__\/([^\s]+-diff\.png)/);
+          if (match) {
+            diffFiles.push({
+              label: testResult.ancestorTitles.concat([testResult.title]).join(' <strong>|</strong> '),
+              filename: match[1],
+            });
           }
-        });
+        }
+      }
+    }
+    
+    if (diffFiles.length) {
+      
+      Promise.all(diffFiles.map(({ filename }) => (
+        this.putFile(filename, 'image/png', fs.readFileSync(`./__tests__/__image_snapshots__/__diff_output__/${filename}`))
+      )))
+      .then(() => this.putFile('index.html', 'text/html', this.visualRegHtml(diffFiles)))
+      .then(() => {
+        console.log();
+        const url = `https://${this.bucket}.s3.amazonaws.com/${this.name}/${this.containerId}/index.html`;
+        fs.outputFileSync('/tmp/visreg_url', url);
+
+        logger.info('View the visual regression results at:');
+        logger.info(url);
       });
     }
   }
