@@ -4,6 +4,7 @@ const path = require('path');
 
 module.exports = {
   rootDir: process.cwd(),
+  testMatch: [ '__tests__/**/*.[jt]s?(x)' ],
   globalSetup: 'jest-environment-puppeteer/setup',
   globalTeardown: 'jest-environment-puppeteer/teardown',
   testEnvironment: 'jest-environment-puppeteer',

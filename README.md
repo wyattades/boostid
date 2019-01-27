@@ -76,3 +76,6 @@ After editing your test files, you can avoid having to push to CircleCI by runni
 
 **Jest image snapshot, for visual regression**
 - https://www.npmjs.com/package/jest-image-snapshot
+
+**Slack messages from CircleCI**
+- https://github.com/CircleCI-Public/slack-orb
