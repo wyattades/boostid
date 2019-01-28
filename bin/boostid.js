@@ -4,10 +4,9 @@ const yargs = require('yargs/yargs');
 const packageJson = require('../package.json');
 const { run } = require('../lib/utils');
 const logger = require('../lib/log');
-const config = require('../lib/config');
 
 
-const runModule = (path) => (argv) => require(path)(argv)
+const runModule = (path, method) => (argv) => (method ? require(path)[method](argv) : require(path)(argv))
 .catch((err) => {
   logger.error(err);
   process.exit(1);
@@ -25,30 +24,63 @@ const runScript = (path) => (argv) => run([ path, ...argv._.slice(1) ])
 });
 
 const commands = [{
-  command: 'create <site_name>',
+  command: 'setup <site_name>',
   desc: 'Create a new site',
-  handler: runModule('../lib/create'),
+  builder: (_yargs) => _yargs
+  .option('new', {
+    desc: 'Creates a new site',
+  }),
+  handler: runModule('../lib/setup'),
 }, {
-  command: 'existing <site_name>',
-  desc: 'Setup dev environment for existing site',
-  handler: runModule('../lib/existing'),
+  command: 'check-local',
+  desc: 'Test if local environment is ready for development',
+  handler: runModule('../lib/local', 'devReady'),
 }, {
   command: 'test [type]',
   desc: 'Test stuff',
   builder: (_yargs) => _yargs
-  .completion()
-  .choices('type', ['visualreg', 'behat', 'all'])
+  .choices('type', ['all', 'visualreg', 'coverage'])
+  .default('type', 'all')
   .option('dev-boostid', {
-    desc: 'Use the local boostid repo',
+    desc: 'Uses a local "boostid" directory (for development)',
     type: 'string',
     requiresArg: true,
-    // global: true // ???
   }),
   handler: runModule('../lib/test'),
 }, {
-  command: 'update',
-  desc: 'Update site with the latest test features',
-  handler: runScript('../lib/update.sh'),
+  command: 'upstream-updates',
+  desc: 'Create "updates" multidev and apply upstream updates',
+  handler: runModule('../lib/update'),
+}, {
+  command: 'trigger-circleci <branch>',
+  desc: 'Trigger a build workflow in CircleCI',
+  builder: (_yargs) => _yargs
+  .option('ci-token', {
+    desc: 'CircleCI API user token',
+    type: 'string',
+    requiresArg: true,
+    default: () => {
+      if (process.env.CIRCLE_TOKEN)
+        return process.env.CIRCLE_TOKEN;
+      return null;
+    },
+  })
+  .option('reponame', {
+    desc: 'Github repository name',
+    type: 'string',
+    requiresArg: true,
+    alias: 'n',
+    default: () => {
+      if (process.env.CIRCLE_PROJECT_REPONAME)
+        return process.env.CIRCLE_PROJECT_REPONAME;
+      try {
+        return require('../lib/config').get().reponame;
+      } catch (_) {
+        return null;
+      }
+    },
+  }),
+  handler: runModule('../lib/circleci', 'triggerBuild'),
 }];
 
 const program = (args) => {
@@ -59,7 +91,7 @@ const program = (args) => {
   .wrap(100)
   .strict(true)
   .demandCommand(1, '')
-  .completion()
+  // .completion()
 
   // version
   .version(packageJson.version)
@@ -71,18 +103,48 @@ const program = (args) => {
     program([ argv.command, '-h' ]);
   })
 
-  // config file
-  .option('config', {
-    desc: 'Path to custom config file',
+  // global options
+  .option('site', {
+    desc: 'Manually set pantheon site id',
     type: 'string',
     requiresArg: true,
-    default: 'boostid.config.js',
-    alias: 'c',
-    coerce: (filename) => {
-      config.setFilename(filename);
-      return filename;
+    alias: 's',
+    defaultDescription: '$PANTHEON_SITE_ID',
+    default: () => {
+      if (process.env.PANTHEON_SITE_ID)
+        return process.env.PANTHEON_SITE_ID;
+      try {
+        return require('../lib/config').get().id;
+      } catch (_) {
+        return null;
+      }
+    },
+  })
+  .option('machine-token', {
+    desc: 'Machine token for Terminus cli',
+    type: 'string',
+    requiresArg: true,
+    alias: 'm',
+    defaultDescription: '$PANTHEON_MACHINE_TOKEN',
+    default: () => {
+      if (process.env.PANTHEON_MACHINE_TOKEN)
+        return process.env.PANTHEON_MACHINE_TOKEN;
+      return null;
     },
   });
+
+  // config file
+  // .option('config', {
+  //   desc: 'Path to custom config file',
+  //   type: 'string',
+  //   requiresArg: true,
+  //   default: 'boostid.config.js',
+  //   alias: 'c',
+  //   coerce: (filename) => {
+  //     config.setFilename(filename);
+  //     return filename;
+  //   },
+  // });
 
   // commands
   for (const cmd of commands) parser.command(cmd);
