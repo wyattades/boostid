@@ -10,15 +10,16 @@
 
 ## Cron task to update `dev` from upstream
 CircleCI steps:
-1. `npm install -g boostid`
-2. `boostid`: Create `updates` multidev (copy of `live`)
-3. `boostid`: Run updates on `updates` multidev
-4. In docker container:
-5. Fetch `updates` multidev code
-6. `npm install`
-7. Runs visualreg tests with `jest`
-8. Merge code with `dev`
-9. Destroy `updates` multidev (even if build fails)
+1. check if there are upstream updates
+2. Create `updates` multidev (copy of `dev`)
+3. Run updates on `updates` multidev
+4. Checkout Pantheon `updates` branch, and push it to github `updates` branch. This will trigger a new job:
+5. In docker container:
+6. Fetch `updates` multidev code
+7. `npm install`
+8. Runs visualreg tests with `jest`
+9. Merge code with `dev`
+10. Destroy `updates` multidev
 
 
 > Note: visualreg tests are comparing `<env>-<sitename>.pantheonsite.io` with `<livesite_url>`
