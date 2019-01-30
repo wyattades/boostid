@@ -98,23 +98,29 @@ class ImageReporter {
     }
     
     if (diffFiles.length) {
-
-      const resultsJson = {
-        version: 1,
-        diffFiles,
-        testResults: results.testResults,
-      };
+      
+      let resultsJson;
+      try {
+        resultsJson = JSON.stringify({
+          version: 1,
+          diffFiles,
+          testResults: results.testResults,
+        });
+      } catch (err) {
+        console.error(err);
+      }
+      if (!resultsJson) resultsJson = '{}';
       
       Promise.all(diffFiles.map(({ filename }) => (
         this.putFile(filename, 'image/png', fs.readFileSync(`./__tests__/__image_snapshots__/__diff_output__/${filename}`))
       )).concat([
         this.putFile('index.html', 'text/html', this.visualRegHtml(diffFiles)),
-        this.putFile('results.json', 'application/json', JSON.stringify(resultsJson)),
+        this.putFile('results.json', 'application/json', resultsJson),
       ]))
       .then(() => {
         console.log();
         const url = `https://${this.bucket}.s3.amazonaws.com/${this.name}/${this.containerId}/index.html`;
-        fs.outputFileSync('/tmp/visreg_url', url);
+        fs.outputFileSync('/tmp/boostid_test_results', url);
 
         logger.info('View the visual regression results at:');
         logger.info(url);
