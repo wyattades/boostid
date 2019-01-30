@@ -1,7 +1,7 @@
-# A minimal Docker image with Node and Puppeteer
+# A minimal Docker image with Node and Chromium
 
 # Immutable node build
-FROM node:10.15.0-slim@sha256:bb4a5a0bdc9886b180d52b556b1e3f3f624bc8c13d50bd3edca1dbeb7aa7ac0b
+FROM node:10.15.0-slim
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4
@@ -26,29 +26,7 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
 ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 /usr/local/bin/dumb-init
 RUN chmod +x /usr/local/bin/dumb-init
 
-# Uncomment to skip the chromium download when installing puppeteer. If you do,
-# you'll need to launch puppeteer with:
-#     browser.launch({executablePath: 'google-chrome-unstable'})
-# ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
-
-# Cache npm packages:
-# COPY package*.json /app/
-# WORKDIR /home/boostid
-# RUN npm install
-
 # Jest doesn't work in root directory so we move down
 WORKDIR /app/
 
 ENTRYPOINT ["dumb-init", "--"]
-
-# Add user so we don't need --no-sandbox.
-# RUN groupadd -r boostid && useradd -r -g boostid -G audio,video boostid \
-#     && mkdir -p /home/boostid/Downloads \
-#     && mkdir -p /home/boostid/app \
-#     && chown -R boostid:boostid /home/boostid
-    # && chown -R boostid:boostid /app/node_modules
-
-# WORKDIR /home/boostid/app
-
-# # Run everything after as non-privileged user.
-# USER pptruser

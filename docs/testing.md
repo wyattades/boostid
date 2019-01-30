@@ -37,3 +37,9 @@ CircleCI steps:
 CircleCI steps:
 1. idk
 
+
+
+# TODO
+- add passed tests to output html?
+- slack message with link to failed
+- set git remotes as same

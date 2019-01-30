@@ -53,15 +53,20 @@ View full [docs](docs/visual_regression.md) -->
 ## Github Setup
 1. Create a new empty repository on Github
 2. `cd` into your Pantheon project's directory
-3. `git remote set-url origin <github_repo_url.git>`
-4. Confirm remote was set successfully by running `git remote -v`
-5. `git push`
+3. `git remote set-url --add origin <github_repo_url.git>`
+4. Confirm both remotes are set successfully by running `git remote -v`
+5. commit and `git push`
 
 ## CircleCI Setup
-1. Create a passwordless rsa SSH key (using `ssh-keygen ...`)
-2. Add the public ssh key to your Pantheon account
-3. Enable this project on CircleCI
-4. Add the private ssh key to the CircleCI project settings
+1. Add the following environment variables to CircleCI through the dashboard:
+   - `PANTHEON_SITE_ID` (required)
+   - `PANTHEON_MACHINE_TOKEN` (required)
+   - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `VISUALREG_BUCKET`: post visual regression results to AWS S3
+   - `SLACK_WEBHOOK`: Post test results to Slack
+<!-- 1. Create a passwordless rsa SSH key (using `ssh-keygen ...`)
+1. Add the public ssh key to your Pantheon account
+2. Enable this project on CircleCI
+3. Add the private ssh key to the CircleCI project settings -->
 
 <!-- ## Local Testing
 After editing your test files, you can avoid having to push to CircleCI by running them locally with `boostid test`. -->

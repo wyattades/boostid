@@ -55,7 +55,7 @@ class ImageReporter {
   ${files.map(({ filename, label }) => `
   <div>
     <p><strong>Test:</strong> ${label}</p>
-    <img src="./${filename}"/>
+    <a href="./${filename}" target="_blank"><img src="./${filename}"/></a>
   </div>`).join('<hr/>')}
 </body>
 </html>
@@ -98,11 +98,19 @@ class ImageReporter {
     }
     
     if (diffFiles.length) {
+
+      const resultsJson = {
+        version: 1,
+        diffFiles,
+        testResults: results.testResults,
+      };
       
       Promise.all(diffFiles.map(({ filename }) => (
         this.putFile(filename, 'image/png', fs.readFileSync(`./__tests__/__image_snapshots__/__diff_output__/${filename}`))
-      )))
-      .then(() => this.putFile('index.html', 'text/html', this.visualRegHtml(diffFiles)))
+      )).concat([
+        this.putFile('index.html', 'text/html', this.visualRegHtml(diffFiles)),
+        this.putFile('results.json', 'application/json', JSON.stringify(resultsJson)),
+      ]))
       .then(() => {
         console.log();
         const url = `https://${this.bucket}.s3.amazonaws.com/${this.name}/${this.containerId}/index.html`;

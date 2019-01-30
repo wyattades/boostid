@@ -20,5 +20,11 @@
   },
   "bin": {
     "boostid": "./bin/boostid.js"
-  }
+  },
+  "files": [
+    "lib/",
+    "scripts/",
+    "tests/",
+    "test_lib/"
+  ]
 }
