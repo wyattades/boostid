@@ -22,6 +22,7 @@
     "boostid": "./bin/boostid.js"
   },
   "files": [
+    "bin/",
     "lib/",
     "scripts/",
     "tests/",
