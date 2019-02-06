@@ -1,29 +1,31 @@
-# Boostid
+# Boostid ![](https://img.shields.io/npm/v/boostid.svg) ![](https://img.shields.io/node/v/boostid.svg)
 
-> Command suite for Rootid development and testing
+> Command suite for [Pantheon](https://pantheon.io) website development and testing
 
-## Getting Started
+#### ** THIS PACKAGE IS NOT YET READY FOR PRODUCTION **
 
-1. Install [Node.js](https://nodejs.org) version 8 and up
-2. Install _Boostid_
-    (If you want to avoid installing Chrome locally for each project, add `export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true` to the __package.json__ `preinstall` script)
+## Installation
+1. Install _Boostid_ globally
     ```bash
-    npm install -S boostid
+    npm install -g boostid
     ```
-3. Setup dev environment for an existing Rootid website
+2. Make sure you have [_Docker_](https://docs.docker.com/install/#supported-platforms) v18.06 and up
     ```bash
-    npx boostid setup my_existing_site
+    docker -v
     ```
-    __OR__ create a new site
+
+## Getting started
+1. Setup dev environment for a new or existing Pantheon site.
     ```bash
-    npx boostid create my_new_site
+    boostid setup -s <sitename>
     ```
-    These commands create a directory named after the site.
-4. After making some changes to the code, test them locally
+    This create a directory `<sitename>` in the current directory, and will walk you through setting up various API services.
+2. After editing the tests in `__tests__` directory, test them locally
     ```bash
-    npx boostid test
+    cd <sitename>
+    boostid test
     ```
-5. Commit and push your changes with `git`, and get notified on `Slack` when the CI service succeeds or fails.
+3. Commit and push your changes with `git`, and get notified on `Slack` when the coverage tests on CircleCI succeed or fail.
 
 ## CLI Documentation
 TODO

@@ -7,16 +7,16 @@
   },
   "dependencies": {
     "aws-sdk": "^2.395.0",
+    "configstore": "^4.0.0",
     "fs-extra": "^7.0.1",
     "inquirer": "^6.2.1",
-    "jest": "^23.6.0",
-    "jest-environment-puppeteer": "^3.9.0",
-    "jest-image-snapshot": "^2.7.0",
-    "jest-puppeteer": "^3.9.0",
     "ora": "^3.0.0",
-    "puppeteer": "1.11.0",
     "superagent": "^4.1.0",
     "yargs": "^12.0.5"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.2.0"
   },
   "bin": {
     "boostid": "./bin/boostid.js"

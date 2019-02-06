@@ -1,0 +1,99 @@
+version: 2.1
+
+orbs:
+  slack: slack/slack@1.0.4
+
+jobs:
+  # commit:
+  #   docker:
+  #     - image: wades/boostid:0.0.1
+  #   working_directory: /app
+  #   steps:
+  #     - visual_reg
+  #     - deploy_to_multidev
+  coverage_tests:
+    docker:
+      - image: wades/boostid:0.0.1
+    working_directory: /app
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            # when lock file changes, use increasingly general patterns to restore cache
+            - node-v1-{{ .Branch }}-{{ checksum "package-lock.json" }}
+            # We can use these once boostid uses git tags or is an npm module
+            # - node-v1-{{ .Branch }}-
+            # - node-v1-
+      - run:
+          name: Install node modules
+          command: npm install
+      - save_cache:
+          key: node-v1-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          paths:
+            - /app/node_modules
+      - run:
+          name: Coverage tests
+          command: ./node_modules/boostid/scripts/run-tests.sh
+      - store_artifacts:
+          path: /tmp/boostid_test_results
+          destination: boostid_test_results
+      - slack/notify:
+          when: on_fail
+          color: "#ed5c5c"
+          message: "Coverage Tests Failed: <${CIRCLE_REPOSITORY_URL}|_${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}_>\n<$(cat /tmp/boostid_test_results)|Test Results>"
+          webhook: "${SLACK_WEBHOOK_NOTIFY}"
+
+      # Deploy to pantheon
+      # - add_ssh_keys:
+      #     fingerprints:
+      #       - "2d:2a:a9:1a:d6:bb:cf:47:a2:7a:3d:cd:43:8b:c6:e6"
+      # - deploy:
+      #     command: |
+      #       git remote set-url origin ssh://codeserver.dev.${PANTHEON_SITE_ID}@codeserver.dev.${PANTHEON_SITE_ID}.drush.in:2222/~/repository.git
+      #       git push
+
+  update_from_upstream:
+    docker:
+      - image: circleci/node:10.15.0
+    steps:
+      # - run:
+      #     name: Install git
+      #     command: apt-get update && apt-get install -y git
+      - run:
+          name: Install boostid globally
+          environment:
+            PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+          command: npm install -g wyattades/boostid
+      - run:
+          name: "Create 'updates' multidev and run upstream updates"
+          command: boostid upstream-updates
+      - add_ssh_keys:
+          fingerprints:
+            - "2d:2a:a9:1a:d6:bb:cf:47:a2:7a:3d:cd:43:8b:c6:e6"
+      - run:
+          name: "Push 'updates' branch to github"
+          command: ./node_modules/boostid/scripts/pantheon-to-github.sh
+
+
+workflows:
+  version: 2.1
+
+  merge_upstream:
+    jobs:
+      - coverage_tests:
+          filters:
+            branches:
+              only:
+                - updates
+
+
+  nightly:
+    jobs:
+      - update_from_upstream
+    triggers:
+      - schedule:
+          cron: "0 0 * * *" # Every day at 12:00am UTC
+          filters:
+            branches:
+              only:
+                - updates

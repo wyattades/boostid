@@ -4,13 +4,19 @@ const yargs = require('yargs/yargs');
 const packageJson = require('../package.json');
 const { run } = require('../lib/utils');
 const logger = require('../lib/log');
+const config = require('../lib/config');
 
 
-const runModule = (path, method) => (argv) => (method ? require(path)[method](argv) : require(path)(argv))
-.catch((err) => {
-  logger.error(err);
-  process.exit(1);
-});
+const runModule = (path, method) => (argv) => {
+
+  config.init(argv);
+
+  return (method ? require(path)[method](argv) : require(path)(argv))
+  .catch((err) => {
+    logger.error(err);
+    process.exit(1);
+  });
+};
 
 // const runScript = (cmd, args) => (argv) => {
 //   spawn(cmd, args ? args : argv._.slice(1), {
@@ -24,12 +30,14 @@ const runScript = (path) => (argv) => run([ path, ...argv._.slice(1) ])
 });
 
 const commands = [{
-  command: 'setup <site_name>',
-  desc: 'Create a new site',
+  command: 'setup',
+  desc: 'Setup dev environment for a new or existing Pantheon site.\n\
+  Creates a directory `sitename` under the current directory',
   builder: (_yargs) => _yargs
-  .option('new', {
-    desc: 'Creates a new site',
-  }),
+  .require('site'),
+  // .option('new', {
+  //   desc: 'Creates a new Pantheon site',
+  // }),
   handler: runModule('../lib/setup'),
 }, {
   command: 'check-local',
@@ -59,26 +67,12 @@ const commands = [{
     desc: 'CircleCI API user token',
     type: 'string',
     requiresArg: true,
-    default: () => {
-      if (process.env.CIRCLE_TOKEN)
-        return process.env.CIRCLE_TOKEN;
-      return null;
-    },
   })
   .option('reponame', {
     desc: 'Github repository name',
     type: 'string',
     requiresArg: true,
     alias: 'n',
-    default: () => {
-      if (process.env.CIRCLE_PROJECT_REPONAME)
-        return process.env.CIRCLE_PROJECT_REPONAME;
-      try {
-        return require('../lib/config').get().reponame;
-      } catch (_) {
-        return null;
-      }
-    },
   }),
   handler: runModule('../lib/circleci', 'triggerBuild'),
 }];
@@ -105,20 +99,11 @@ const program = (args) => {
 
   // global options
   .option('site', {
-    desc: 'Manually set pantheon site id',
+    desc: 'Manually set pantheon site name or id',
     type: 'string',
     requiresArg: true,
     alias: 's',
     defaultDescription: '$PANTHEON_SITE_ID',
-    default: () => {
-      if (process.env.PANTHEON_SITE_ID)
-        return process.env.PANTHEON_SITE_ID;
-      try {
-        return require('../lib/config').get().id;
-      } catch (_) {
-        return null;
-      }
-    },
   })
   .option('machine-token', {
     desc: 'Machine token for Terminus cli',
@@ -126,11 +111,6 @@ const program = (args) => {
     requiresArg: true,
     alias: 'm',
     defaultDescription: '$PANTHEON_MACHINE_TOKEN',
-    default: () => {
-      if (process.env.PANTHEON_MACHINE_TOKEN)
-        return process.env.PANTHEON_MACHINE_TOKEN;
-      return null;
-    },
   });
 
   // config file
