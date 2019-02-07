@@ -2,7 +2,7 @@
 
 const yargs = require('yargs/yargs');
 const packageJson = require('../package.json');
-const { run } = require('../lib/utils');
+// const { run } = require('../lib/utils');
 const logger = require('../lib/log');
 const config = require('../lib/config');
 
@@ -11,11 +11,12 @@ const runModule = (path, method) => (argv) => {
 
   config.init(argv);
 
-  return (method ? require(path)[method](argv) : require(path)(argv))
-  .catch((err) => {
-    logger.error(err);
-    process.exit(1);
-  });
+  const res = (method ? require(path)[method](argv) : require(path)(argv));
+  if (res instanceof Promise)
+    res.catch((err) => {
+      logger.error(err);
+      process.exit(1);
+    });
 };
 
 // const runScript = (cmd, args) => (argv) => {
@@ -23,11 +24,11 @@ const runModule = (path, method) => (argv) => {
 //     stdio: 'inherit',
 //   });
 // };
-const runScript = (path) => (argv) => run([ path, ...argv._.slice(1) ])
-.catch((err) => {
-  logger.error(err);
-  process.exit(1);
-});
+// const runScript = (path) => (argv) => run([ path, ...argv._.slice(1) ])
+// .catch((err) => {
+//   logger.error(err);
+//   process.exit(1);
+// });
 
 const commands = [{
   command: 'setup',
@@ -62,19 +63,15 @@ const commands = [{
 }, {
   command: 'trigger-circleci <branch>',
   desc: 'Trigger a build workflow in CircleCI',
-  builder: (_yargs) => _yargs
-  .option('ci-token', {
-    desc: 'CircleCI API user token',
-    type: 'string',
-    requiresArg: true,
-  })
-  .option('reponame', {
-    desc: 'Github repository name',
-    type: 'string',
-    requiresArg: true,
-    alias: 'n',
-  }),
   handler: runModule('../lib/circleci', 'triggerBuild'),
+}, {
+  command: 'config-get [key]',
+  desc: 'TODO',
+  handler: runModule('../lib/config', 'getArg'),
+}, {
+  command: 'config-set <key> [value]',
+  desc: 'TODO',
+  handler: runModule('../lib/config', 'setArg'),
 }];
 
 const program = (args) => {
@@ -103,7 +100,7 @@ const program = (args) => {
     type: 'string',
     requiresArg: true,
     alias: 's',
-    defaultDescription: '$PANTHEON_SITE_ID',
+    defaultDescription: '$PANTHEON_SITE_NAME',
   })
   .option('machine-token', {
     desc: 'Machine token for Terminus cli',
@@ -111,7 +108,18 @@ const program = (args) => {
     requiresArg: true,
     alias: 'm',
     defaultDescription: '$PANTHEON_MACHINE_TOKEN',
+  })
+  .option('ci-token', {
+    desc: 'CircleCI API user token',
+    type: 'string',
+    requiresArg: true,
   });
+  // .option('reponame', {
+  //   desc: 'Github repository name',
+  //   type: 'string',
+  //   requiresArg: true,
+  //   alias: 'n',
+  // });
 
   // config file
   // .option('config', {
