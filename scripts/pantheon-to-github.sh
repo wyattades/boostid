@@ -2,7 +2,12 @@
 
 set -e
 
-$MULTIDEV=updates
+$MULTIDEV=$1
+
+if [ -z "$MULTIDEV" ]; then
+  echo "Usage: pantheon-to-github.sh <multidev>"
+  exit 1
+fi
 
 rm -rf /tmp/boostid_updates_repo
 git clone --branch $MULTIDEV ssh://codeserver.dev.${PANTHEON_SITE_ID}@codeserver.dev.${PANTHEON_SITE_ID}.drush.in:2222/~/repository.git /tmp/boostid_updates_repo

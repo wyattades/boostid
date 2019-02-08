@@ -1,12 +1,16 @@
 version: 2.1
 
-jobs:
+commands:
+  description: "Coverage Tests"
   coverage_tests:
-    docker:
-      - image: wades/boostid:0.0.1
-    working_directory: /app
     steps:
-      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - ${PANTHEON_SSH_FINGERPRINT}
+      - run:
+          name: Checkout Pantheon repository
+          command: |
+            git clone ssh://codeserver.dev.${PANTHEON_SITE_ID}@codeserver.dev.${PANTHEON_SITE_ID}.drush.in:2222/~/repository.git .
       - restore_cache:
           keys:
             # when lock file changes, use increasingly general patterns to restore cache
@@ -28,9 +32,11 @@ jobs:
           path: /tmp/boostid_test_results
           destination: boostid_test_results
 
-  update_from_upstream:
+jobs:
+  upstream_updates:
     docker:
-      - image: circleci/node:10.15.0
+      - image: wades/boostid:0.0.1
+    working_directory: /app
     steps:
       - run:
           name: Install boostid globally
@@ -38,32 +44,31 @@ jobs:
       - run:
           name: "Run upstream updates on 'updates' multidev"
           command: boostid upstream-updates
-      - add_ssh_keys:
-          fingerprints:
-            - "${PANTHEON_SSH_FINGERPRINT}"
+      - coverage_tests
       - run:
-          name: "Push 'updates' branch to github"
-          command: ./node_modules/boostid/scripts/pantheon-to-github.sh
-
+          name: "Merge 'updates' multidev to 'dev'"
+          command: boostid ter multidevMergeToDev updates
+          when: on_success
+      # - run:
+      #     name: "Push 'updates' branch to github"
+      #     command: ./node_modules/boostid/scripts/pantheon-to-github.sh updates
+      #     when: on_success
 
 workflows:
   version: 2.1
 
-  merge_upstream:
-    jobs:
-      - coverage_tests:
-          filters:
-            branches:
-              only:
-                - updates
-
   nightly:
     jobs:
-      - update_from_upstream
-    triggers:
-      - schedule:
-          cron: "0 0 * * *" # Every day at 12:00am UTC
+      - upstream_updates
+          # TEMP
           filters:
             branches:
-              only:
-                - updates
+              only: master
+
+    # triggers:
+    #   - schedule:
+    #       cron: "0 0 * * *" # Every day at 12:00am UTC
+    #       filters:
+    #         branches:
+    #           only:
+    #             - master
