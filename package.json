@@ -2,8 +2,8 @@
   "name": "boostid",
   "version": "0.0.1",
   "scripts": {
-    "docker:build": "docker build -t wades/boostid:$(node -p \"require('./package.json').version\") ./docker",
-    "docker:deploy": "docker push wades/boostid:$(node -p \"require('./package.json').version\")"
+    "docker:build": "docker build -t wades/boostid:$npm_package_version ./docker",
+    "docker:deploy": "docker push wades/boostid:$npm_package_version"
   },
   "dependencies": {
     "aws-sdk": "^2.395.0",
