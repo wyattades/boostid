@@ -66,6 +66,10 @@ const commands = [{
   desc: 'Create "updates" multidev and apply upstream updates',
   handler: runModule('../lib/update'),
 }, {
+  command: 'ter <cmd> [args ...]',
+  desc: 'Run terminus commands',
+  handler: runModule('../lib/terminus', 'run'),
+}, {
   command: 'trigger-circleci <branch>',
   desc: 'Trigger a build workflow in CircleCI',
   handler: runModule('../lib/circleci', 'triggerBuild'),
