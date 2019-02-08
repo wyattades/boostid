@@ -19,8 +19,12 @@
     ```bash
     boostid setup -s <sitename>
     ```
-    This create a directory `<sitename>` in the current directory, and will walk you through setting up various API services.
-2. After editing the tests in `__tests__` directory, test them locally
+    This walks the user through the following:
+    - Authenticate with APIs: _CircleCI, Terminus, Slack_ (this only needs to be done once)
+    - Clones Pantheon site into folder under the current directory
+    - Setup a multidev for automated upstream updates
+    - Add Boostid config and testing files to project
+2. After editing the tests in the `__tests__` directory, test them locally
     ```bash
     cd <sitename>
     boostid test
@@ -28,7 +32,10 @@
 3. Commit and push your changes with `git`, and get notified on `Slack` when the coverage tests on CircleCI succeed or fail.
 
 ## CLI Documentation
-TODO
+You can view the CLI documentation by running:
+```bash
+boostid --help
+```
 
 ## Config File
 
