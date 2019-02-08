@@ -1,5 +1,4 @@
 const fs = require('fs-extra');
-const config = require('../lib/config');
 const logger = require('../lib/log');
 
 
@@ -10,8 +9,6 @@ class ImageReporter {
     this._options = options;
 
     if (process.env.AWS_ACCESS_KEY_ID && process.env.VISUALREG_BUCKET) {
-      const { name } = config.get();
-
       logger.info('Setting up AWS S3 for visual regression image hosting...');
 
       require('aws-sdk/global');
@@ -19,7 +16,7 @@ class ImageReporter {
 
       this.s3 = new S3({ apiVersion: '2006-03-01' });
       this.bucket = process.env.VISUALREG_BUCKET;
-      this.name = name;
+      this.name = process.env.PANTHEON_SITE_NAME;
       try {
         this.containerId = fs.readFileSync('/etc/hostname', 'utf8').trim();
       } catch (_) {

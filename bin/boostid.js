@@ -45,13 +45,19 @@ const commands = [{
   desc: 'Test if local environment is ready for development',
   handler: runModule('../lib/local', 'devReady'),
 }, {
-  command: 'test [type]',
-  desc: 'Test stuff',
+  command: 'test',
+  desc: 'Run coverage tests locally in a Docker container',
   builder: (_yargs) => _yargs
-  .choices('type', ['all', 'visualreg', 'coverage'])
-  .default('type', 'all')
+  // .choices('type', ['all', 'visualreg', 'coverage'])
+  // .default('type', 'all')
+  .option('results', {
+    desc: 'Local path to store test results. Set to "S3" if you want the results uploaded online',
+    type: 'string',
+    default: './__image_snapshots__',
+    requiresArg: true,
+  })
   .option('dev-boostid', {
-    desc: 'Uses a local "boostid" directory (for development)',
+    desc: 'FOR DEVELOPMENT ONLY: Uses a local "boostid" directory',
     type: 'string',
     requiresArg: true,
   }),
@@ -66,11 +72,13 @@ const commands = [{
   handler: runModule('../lib/circleci', 'triggerBuild'),
 }, {
   command: 'config-get [key]',
-  desc: 'TODO',
+  desc: 'Prints config value for specified "key". Exclude "key" to get all config as json',
+  example: 'boostid config-get session.user_id',
   handler: runModule('../lib/config', 'getArg'),
 }, {
   command: 'config-set <key> [value]',
-  desc: 'TODO',
+  desc: 'Set config value for specified "key". Exclude "value" to delete the key instead',
+  example: 'boostid config-set foo.bar biz',
   handler: runModule('../lib/config', 'setArg'),
 }];
 
@@ -96,7 +104,7 @@ const program = (args) => {
 
   // global options
   .option('site', {
-    desc: 'Manually set pantheon site name or id',
+    desc: 'Manually set pantheon site name',
     type: 'string',
     requiresArg: true,
     alias: 's',
