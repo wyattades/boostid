@@ -32,8 +32,7 @@ const runModule = (path, method) => (argv) => {
 
 const commands = [{
   command: 'setup',
-  desc: 'Setup dev environment for a new or existing Pantheon site.\n\
-  Creates a directory `sitename` under the current directory',
+  desc: 'Setup a Pantheon site for development with Boostid',
   builder: (_yargs) => _yargs
   .require('site'),
   // .option('new', {

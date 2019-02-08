@@ -17,12 +17,53 @@ class ImageReporter {
       this.s3 = new S3({ apiVersion: '2006-03-01' });
       this.bucket = process.env.VISUALREG_BUCKET;
       this.name = process.env.PANTHEON_SITE_NAME;
+
       try {
         this.containerId = fs.readFileSync('/etc/hostname', 'utf8').trim();
-      } catch (_) {
-        this.containerId = Math.floor(Math.random() * 1000000000).toString();
-      }
+      } catch (_) {}
+      if (!this.containerId)
+        this.containerId = require('crypto').randomBytes(20).toString('hex');
     }
+  }
+
+  slackNotify(testResultsUrl) {
+
+    const data = {
+      attachments: [{
+        fallback: `Coverage Tests Failed on ${this.name}/\
+${process.env.CIRCLE_BRANCH} - ${process.env.CIRCLE_BUILD_URL} - ${testResultsUrl}`,
+        text: `*${this.name}*: Coverage Tests Failed`,
+        mrkdwn_in: ['text', 'fields'],
+        fields: [{
+          title: 'Project',
+          value: `<${process.env.CIRCLE_PROJECT_URL}|\
+${process.env.CIRCLE_PROJECT_REPONAME} _(${process.env.CIRCLE_BRANCH})_>`,
+          short: true,
+        }, {
+          title: 'Job Number',
+          value: `<${process.env.CIRCLE_BUILD_URL}|${process.env.CIRCLE_BUILD_NUM}>`,
+          short: true,
+        }],
+        actions: [{
+          type: 'button',
+          text: 'Test Results',
+          url: testResultsUrl,
+          style: 'primary',
+        }, {
+          type: 'button',
+          text: 'Dev Site',
+          url: `https://dev-${this.name}.pantheonsite.io`,
+        }, {
+          type: 'button',
+          text: 'Updates Site',
+          url: `https://updates-${this.name}.pantheonsite.io`,
+        }],
+        color: 'danger',
+      }],
+    };
+  
+    return require('superagent').post(process.env.SLACK_NOTIFY_URL)
+    .send(data);
   }
 
   visualRegHtml(files) {
@@ -109,7 +150,8 @@ class ImageReporter {
       if (!resultsJson) resultsJson = '{}';
       
       Promise.all(diffFiles.map(({ filename }) => (
-        this.putFile(filename, 'image/png', fs.readFileSync(`./__tests__/__image_snapshots__/__diff_output__/${filename}`))
+        this.putFile(filename, 'image/png',
+          fs.readFileSync(`./__tests__/__image_snapshots__/__diff_output__/${filename}`))
       )).concat([
         this.putFile('index.html', 'text/html', this.visualRegHtml(diffFiles)),
         this.putFile('results.json', 'application/json', resultsJson),
@@ -121,6 +163,11 @@ class ImageReporter {
 
         logger.info('View the visual regression results at:');
         logger.info(url);
+
+        // Only send to Slack if on CI service
+        if (process.env.SLACK_NOTIFY_URL && process.env.CIRCLE_REPOSITORY_URL) {
+          return this.slackNotify(url);
+        }
       });
     }
   }

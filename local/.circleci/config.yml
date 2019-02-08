@@ -1,8 +1,5 @@
 version: 2.1
 
-orbs:
-  slack: slack/slack@1.0.4
-
 jobs:
   coverage_tests:
     docker:
@@ -30,11 +27,6 @@ jobs:
       - store_artifacts:
           path: /tmp/boostid_test_results
           destination: boostid_test_results
-      - slack/notify:
-          when: on_fail
-          color: "#ed5c5c"
-          message: "Coverage Tests Failed: <${CIRCLE_REPOSITORY_URL}|_${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}_>\n<$(cat /tmp/boostid_test_results)|Test Results>"
-          webhook: "${SLACK_WEBHOOK_NOTIFY}"
 
   update_from_upstream:
     docker:

@@ -5,11 +5,11 @@
 #### ** THIS PACKAGE IS NOT YET READY FOR PRODUCTION **
 
 ## Installation
-1. Install _Boostid_ globally
+- Install _Boostid_ globally
     ```bash
-    npm install -g boostid
+    npm install -g wyattades/boostid
     ```
-2. Make sure you have [_Docker_](https://docs.docker.com/install/#supported-platforms) v18.06 and up
+- Make sure you have [_Docker_](https://docs.docker.com/install/#supported-platforms) v18 and up
     ```bash
     docker -v
     ```
@@ -52,37 +52,11 @@ View full [docs](docs/navigation_tests.md)
 
 View full [docs](docs/visual_regression.md) -->
 
-## Github Setup
-1. Create a new empty repository on Github
-2. `cd` into your Pantheon project's directory
-3. `git remote set-url --add origin <github_repo_url.git>`
-4. Confirm both remotes are set successfully by running `git remote -v`
-5. commit and `git push`
-
-## CircleCI Setup
-1. Add the following environment variables to CircleCI through the dashboard:
-   - `PANTHEON_SITE_ID` (required)
-   - `PANTHEON_MACHINE_TOKEN` (required)
-   - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `VISUALREG_BUCKET`: post visual regression results to AWS S3
-   - `SLACK_WEBHOOK`: Post test results to Slack
-<!-- 1. Create a passwordless rsa SSH key (using `ssh-keygen ...`)
-1. Add the public ssh key to your Pantheon account
-2. Enable this project on CircleCI
-3. Add the private ssh key to the CircleCI project settings -->
-
-<!-- ## Local Testing
-After editing your test files, you can avoid having to push to CircleCI by running them locally with `boostid test`. -->
-
 ## Helpful Links
 
-**Puppeteer API**
+**Puppeteer API** headless Chrome testing
 - https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md
 
-**Deploy files to S3 bucket with AWS**
-- https://www.npmjs.com/package/aws-sdk
-
-**Jest image snapshot, for visual regression**
+**Jest Testing with Puppeteer**
+- https://www.npmjs.com/package/jest-environment-puppeteer
 - https://www.npmjs.com/package/jest-image-snapshot
-
-**Slack messages from CircleCI**
-- https://github.com/CircleCI-Public/slack-orb
