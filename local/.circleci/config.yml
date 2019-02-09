@@ -48,7 +48,11 @@ jobs:
       - run:
           name: "Merge 'updates' multidev to 'dev'"
           command: boostid ter multidevMergeToDev updates
-          when: on_success
+      - run:
+          command: 'node ./node_modules/boostid/lib/slack success'
+      - run:
+          command: 'node ./node_modules/boostid/lib/slack fail'
+          when: on_fail
       # - run:
       #     name: "Push 'updates' branch to github"
       #     command: ./node_modules/boostid/scripts/pantheon-to-github.sh updates
