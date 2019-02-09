@@ -56,7 +56,7 @@ const commands = [{
     requiresArg: true,
   })
   .option('dev-boostid', {
-    desc: 'FOR DEVELOPMENT ONLY: Uses a local "boostid" directory',
+    desc: 'FOR DEVELOPMENT ONLY: Path to a local "boostid" repository',
     type: 'string',
     requiresArg: true,
   }),

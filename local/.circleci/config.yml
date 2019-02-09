@@ -59,8 +59,7 @@ workflows:
 
   nightly:
     jobs:
-      - upstream_updates
-          # TEMP
+      - upstream_updates:
           filters:
             branches:
               only: master

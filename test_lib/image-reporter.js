@@ -168,7 +168,8 @@ ${process.env.CIRCLE_PROJECT_REPONAME} _(${process.env.CIRCLE_BRANCH})_>`,
         if (process.env.SLACK_NOTIFY_URL && process.env.CIRCLE_REPOSITORY_URL) {
           return this.slackNotify(url);
         }
-      });
+      })
+      .catch(console.error);
     }
   }
 }

@@ -42,7 +42,7 @@ boostid --help
 There should be a file __boostid.config.js__ in your project root.
 
 It must export an object with the following properties:
-- **name**: Unique Pantheon name
+- **name**: Unique Pantheon site name
 - **id**: Unique Pantheon id
 - **multidev**: the name of the multidev to run automatic updates on (do not use this multidev for anything else)
 - **pages**: Array of config objects for each path. Page config properties:
