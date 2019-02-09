@@ -15,7 +15,7 @@
     ```
 
 ## Getting started
-1. Setup dev environment for a new or existing Pantheon site.
+1. Setup dev environment for an existing Pantheon site.
     ```bash
     boostid setup -s <sitename>
     ```
@@ -34,7 +34,30 @@
 ## CLI Documentation
 You can view the CLI documentation by running:
 ```bash
-boostid --help
+$ boostid --help
+Command suite for Rootid development and testing
+
+Usage: boostid <command> [options]
+
+Commands:
+  boostid help <command>             View help for a specific command
+  boostid setup                      Setup a Pantheon site for development with Boostid
+  boostid check-local                Test if local environment is ready for development
+  boostid test                       Run coverage tests locally in a Docker container
+  boostid upstream-updates           Create "updates" multidev and apply upstream updates
+  boostid ter <cmd> [args ...]       Run terminus commands
+  boostid trigger-circleci <branch>  Trigger a build workflow in CircleCI
+  boostid config-get [key]           Prints config value for specified "key". Exclude "key" to get
+                                     all config as json
+  boostid config-set <key> [value]   Set config value for specified "key". Exclude "value" to delete
+                                     the key instead
+
+Options:
+  --site, -s           Manually set pantheon site name       [string] [default: $PANTHEON_SITE_NAME]
+  --machine-token, -m  Machine token for Terminus cli    [string] [default: $PANTHEON_MACHINE_TOKEN]
+  --ci-token           CircleCI API user token                                              [string]
+  -v, --version        Show version number                                                 [boolean]
+  -h, --help           Show help  
 ```
 
 ## Config File
@@ -44,7 +67,7 @@ There should be a file __boostid.config.js__ in your project root.
 It must export an object with the following properties:
 - **name**: Unique Pantheon site name
 - **id**: Unique Pantheon id
-- **multidev**: the name of the multidev to run automatic updates on (do not use this multidev for anything else)
+- **bucket**: AWS S3 bucket for hosting visual regression tests
 - **pages**: Array of config objects for each path. Page config properties:
   - **path**: e.g. `'/my-page'`
   - **visualreg**: whether or not to run visual regression on this page (boolean)
