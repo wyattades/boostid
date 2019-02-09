@@ -26,46 +26,6 @@ class ImageReporter {
     }
   }
 
-  slackNotify(testResultsUrl) {
-
-    const data = {
-      attachments: [{
-        fallback: `Coverage Tests Failed on ${this.name}/\
-${process.env.CIRCLE_BRANCH} - ${process.env.CIRCLE_BUILD_URL} - ${testResultsUrl}`,
-        text: `*${this.name}*: Coverage Tests Failed`,
-        mrkdwn_in: ['text', 'fields'],
-        fields: [{
-          title: 'Project',
-          value: `<${process.env.CIRCLE_PROJECT_URL}|\
-${process.env.CIRCLE_PROJECT_REPONAME} _(${process.env.CIRCLE_BRANCH})_>`,
-          short: true,
-        }, {
-          title: 'Job Number',
-          value: `<${process.env.CIRCLE_BUILD_URL}|${process.env.CIRCLE_BUILD_NUM}>`,
-          short: true,
-        }],
-        actions: [{
-          type: 'button',
-          text: 'Test Results',
-          url: testResultsUrl,
-          style: 'primary',
-        }, {
-          type: 'button',
-          text: 'Dev Site',
-          url: `https://dev-${this.name}.pantheonsite.io`,
-        }, {
-          type: 'button',
-          text: 'Updates Site',
-          url: `https://updates-${this.name}.pantheonsite.io`,
-        }],
-        color: 'danger',
-      }],
-    };
-  
-    return require('superagent').post(process.env.SLACK_NOTIFY_URL)
-    .send(data);
-  }
-
   visualRegHtml(files) {
     return `
 <!DOCTYPE html>
@@ -163,11 +123,6 @@ ${process.env.CIRCLE_PROJECT_REPONAME} _(${process.env.CIRCLE_BRANCH})_>`,
 
         logger.info('View the visual regression results at:');
         logger.info(url);
-
-        // Only send to Slack if on CI service
-        if (process.env.SLACK_NOTIFY_URL && process.env.CIRCLE_REPOSITORY_URL) {
-          return this.slackNotify(url);
-        }
       })
       .catch(console.error);
     }

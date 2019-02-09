@@ -24,6 +24,7 @@
   "files": [
     "bin/",
     "lib/",
+    "local/",
     "scripts/",
     "tests/",
     "test_lib/"
