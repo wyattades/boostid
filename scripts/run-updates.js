@@ -8,18 +8,20 @@ const update = require('../lib/update');
 const slack = require('../lib/slack');
 
 
+// const test = () => run(`npx jest --color --ci=false --runInBand --no-watchman --config \
+// ./node_modules/boostid/test_lib/jest.config.js`, false, {
+//   env: {
+//     JEST_PUPPETEER_CONFIG: './node_modules/boostid/test_lib/jest-puppeteer.config.js',
+//   },
+// });
+
 (async () => {
 
   config.init();
 
   await update();
 
-  await run(`npx jest --color --ci=false --runInBand --no-watchman --config \
-./node_modules/boostid/test_lib/jest.config.js`, false, {
-    env: {
-      JEST_PUPPETEER_CONFIG: './node_modules/boostid/test_lib/jest-puppeteer.config.js',
-    },
-  });
+  await run(`./node_modules/boostid/scripts/run-tests.sh`);
 
   await ter.multidevMergeToDev('updates');
 

@@ -1,8 +1,11 @@
 version: 2.1
 
-commands:
-  description: "Coverage Tests"
-  coverage_tests:
+
+jobs:
+  upstream_updates:
+    docker:
+      - image: wades/boostid:0.0.1
+    working_directory: /app
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -26,37 +29,12 @@ commands:
           paths:
             - /app/node_modules
       - run:
-          name: Coverage tests
-          command: ./node_modules/boostid/scripts/run-tests.sh
+          name: Run updates and coverage tests
+          command: ./node_modules/boostid/scripts/run-updates.js
       - store_artifacts:
           path: /tmp/boostid_test_results
           destination: boostid_test_results
 
-jobs:
-  upstream_updates:
-    docker:
-      - image: wades/boostid:0.0.1
-    working_directory: /app
-    steps:
-      - run:
-          name: Install boostid globally
-          command: npm install -g wyattades/boostid
-      - run:
-          name: "Run upstream updates on 'updates' multidev"
-          command: boostid upstream-updates
-      - coverage_tests
-      - run:
-          name: "Merge 'updates' multidev to 'dev'"
-          command: boostid ter multidevMergeToDev updates
-      - run:
-          command: 'node ./node_modules/boostid/lib/slack success'
-      - run:
-          command: 'node ./node_modules/boostid/lib/slack fail'
-          when: on_fail
-      # - run:
-      #     name: "Push 'updates' branch to github"
-      #     command: ./node_modules/boostid/scripts/pantheon-to-github.sh updates
-      #     when: on_success
 
 workflows:
   version: 2.1
