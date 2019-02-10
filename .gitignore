@@ -2,7 +2,7 @@
 wades-example/
 circleci/
 differencify/
-wades/
+wades*
 
 # Logs
 logs

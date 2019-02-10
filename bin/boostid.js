@@ -52,28 +52,6 @@ const commands = [{
   }),
   handler: runModule('../lib/test'),
 }, {
-  command: 'upstream-updates <multidev>',
-  desc: 'Create multidev as copy of "dev" and apply upstream updates',
-  handler: runModule('../lib/update'),
-}, {
-  command: 'ci-update-envs',
-  desc: 'Update CircleCI environment variables',
-  handler: runModule('../lib/ci', 'updateEnvs'),
-}, {
-  command: 'ter <cmd> [args...]',
-  desc: 'Run terminus commands',
-  builder: (_yargs) => _yargs
-  .coerce('cmd', (cmd) => {
-    if (cmd in require('../lib/terminus').commands()) return cmd;
-    else throw `${cmd} is not a valid command`;
-  })
-  .usage(`boostid ter <cmd>\n\nRun terminus commands. Available commands:\n${require('../lib/terminus').help()}`),
-  handler: runModule('../lib/terminus', 'run'),
-// }, {
-//   command: 'trigger-circleci <branch>',
-//   desc: 'Trigger a build workflow in CircleCI',
-//   handler: runModule('../lib/circleci', 'triggerBuild'),
-}, {
   command: 'config',
   desc: 'Read and write global config',
   example: 'boostid config-get session.user_id',
@@ -100,6 +78,34 @@ const commands = [{
 //   desc: 'Set config value for specified "key". Exclude "value" to delete the key instead',
 //   example: 'boostid config-set foo.bar biz',
 //   handler: runModule('../lib/config', 'setArg'),
+}, {
+  command: 'upstream-updates <multidev>',
+  desc: 'Create multidev as copy of "dev" and apply upstream updates',
+  handler: runModule('../lib/update'),
+}, {
+  command: 'ci-update-meta <git>',
+  desc: 'Update CircleCI environment variables of specified git url',
+  builder: (_yargs) => _yargs
+  .option('slack-webhook', {
+    desc: 'Slack webhook url',
+    type: 'string',
+    requiresArg: true,
+  }),
+  handler: runModule('../lib/ci', 'updateMeta'),
+}, {
+  command: 'ter <cmd> [args...]',
+  desc: 'Run terminus commands',
+  builder: (_yargs) => _yargs
+  .coerce('cmd', (cmd) => {
+    if (cmd in require('../lib/terminus').commands()) return cmd;
+    else throw `${cmd} is not a valid command`;
+  })
+  .usage(`boostid ter <cmd>\n\nRun terminus commands. Available commands:\n${require('../lib/terminus').help()}`),
+  handler: runModule('../lib/terminus', 'run'),
+  // }, {
+  //   command: 'trigger-circleci <branch>',
+  //   desc: 'Trigger a build workflow in CircleCI',
+  //   handler: runModule('../lib/circleci', 'triggerBuild'),
 }];
 
 const program = (args) => {
