@@ -1,7 +1,16 @@
+/**
+ * @typedef PageConfig
+ * @property {string} path Path of page e.g. "/my-page"
+ * @property {{width: number, height: number, isMobile: boolean}[]} viewPorts
+ */
 
-exports.visualReg = (config, base) => {
+/**
+ * @param {PageConfig[]} pages Array of config object for each page
+ * @param {string} base Base url
+ */
+exports.visualReg = (pages, base) => {
 
-  for (const { path, viewPorts } of config.pages) {
+  for (const { path, viewPorts } of pages) {
     describe(`Goes to path: ${path}`, () => {
 
       beforeAll(async () => {
@@ -23,9 +32,3 @@ exports.visualReg = (config, base) => {
   }
 
 };
-
-// exports.visualReg = (config, multidev) => generateScreenshots(`https://${config.multidev}-${config.name}.pantheonsite.io`);
-
-// exports.visualRegOnUpdates = () => generateScreenshots(`https://${config.multidev}-${config.name}.pantheonsite.io`);
-
-// exports.visualRegOnLive = () => generateScreenshots(config.liveSite);
