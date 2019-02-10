@@ -9,11 +9,11 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - ${PANTHEON_SSH_FINGERPRINT}
+            - ${BOOSTID_SSH_FINGERPRINT}
       - run:
           name: Checkout Pantheon repository
           command: |
-            git clone ssh://codeserver.dev.${PANTHEON_SITE_ID}@codeserver.dev.${PANTHEON_SITE_ID}.drush.in:2222/~/repository.git .
+            git clone ssh://codeserver.dev.${BOOSTID_ID}@codeserver.dev.${BOOSTID_ID}.drush.in:2222/~/repository.git .
       - restore_cache:
           keys:
             # when lock file changes, use increasingly general patterns to restore cache

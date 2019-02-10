@@ -15,12 +15,12 @@
     ```
 
 ## Getting started
-1. Setup dev environment for an existing Pantheon site.
+1. Setup dev environment for an existing Pantheon site, where `<sitename>` is the site's Pantheon name
     ```bash
     boostid setup -s <sitename>
     ```
     This walks the user through the following:
-    - Authenticate with APIs: _CircleCI, Terminus, Slack_ (this only needs to be done once)
+    - Authenticate with APIs: _CircleCI, AWS, Terminus, Slack_ (this only needs to be done once)
     - Clones Pantheon site into folder under the current directory
     - Setup a multidev for automated upstream updates
     - Add Boostid config and testing files to project
@@ -40,17 +40,17 @@ Command suite for Rootid development and testing
 Usage: boostid <command> [options]
 
 Commands:
-  boostid help <command>             View help for a specific command
-  boostid setup                      Setup a Pantheon site for development with Boostid
-  boostid check-local                Test if local environment is ready for development
-  boostid test                       Run coverage tests locally in a Docker container
-  boostid upstream-updates           Create "updates" multidev and apply upstream updates
-  boostid ter <cmd> [args ...]       Run terminus commands
-  boostid trigger-circleci <branch>  Trigger a build workflow in CircleCI
-  boostid config-get [key]           Prints config value for specified "key". Exclude "key" to get
-                                     all config as json
-  boostid config-set <key> [value]   Set config value for specified "key". Exclude "value" to delete
-                                     the key instead
+  boostid help <command>               View help for a specific command
+  boostid setup                        Setup a Pantheon site for development with Boostid
+  boostid check-local                  Test if local environment is ready for development
+  boostid test                         Run coverage tests locally in a Docker container
+  boostid upstream-updates <multidev>  Create multidev and apply upstream updates
+  boostid ter <cmd> [args ...]         Run terminus commands
+  boostid trigger-circleci <branch>    Trigger a build workflow in CircleCI
+  boostid config-get [key]             Prints config value for specified "key". Exclude "key" to get
+                                       all config as json
+  boostid config-set <key> [value]     Set config value for specified "key". Exclude "value" to delete
+                                       the key instead
 
 Options:
   --site, -s           Manually set pantheon site name       [string] [default: $PANTHEON_SITE_NAME]

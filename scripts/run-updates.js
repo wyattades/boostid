@@ -6,6 +6,7 @@ const config = require('../lib/config');
 const ter = require('../lib/terminus');
 const update = require('../lib/update');
 const slack = require('../lib/slack');
+const log = require('../lib/log');
 
 
 // const test = () => run(`npx jest --color --ci=false --runInBand --no-watchman --config \
@@ -19,17 +20,21 @@ const slack = require('../lib/slack');
 
   config.init();
 
-  await update();
+  const multidev = config.get('multidev');
 
+  await update({ multidev });
+
+  log.info('Running coverage tests');
   await run(`./node_modules/boostid/scripts/run-tests.sh`);
 
-  await ter.multidevMergeToDev('updates');
+  log.info('Merging multidev to dev');
+  await ter.multidevMergeToDev(multidev);
 
   await slack({ failed: false });
   
 })()
 .catch(async (err) => {
-  console.error(err);
+  log.error(err);
 
   let testResultsUrl;
   try {

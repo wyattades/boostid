@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const logger = require('../lib/log');
+const log = require('../lib/log');
 
 
 class ImageReporter {
@@ -8,15 +8,15 @@ class ImageReporter {
     this._globalConfig = globalConfig;
     this._options = options;
 
-    if (process.env.AWS_ACCESS_KEY_ID && process.env.VISUALREG_BUCKET) {
-      logger.info('Setting up AWS S3 for visual regression image hosting...');
+    if (process.env.AWS_ACCESS_KEY_ID && process.env.BOOSTID_BUCKET) {
+      log.info('Setting up AWS S3 for visual regression image hosting...');
 
       require('aws-sdk/global');
       const S3 = require('aws-sdk/clients/s3');
 
       this.s3 = new S3({ apiVersion: '2006-03-01' });
-      this.bucket = process.env.VISUALREG_BUCKET;
-      this.name = process.env.PANTHEON_SITE_NAME;
+      this.bucket = process.env.BOOSTID_BUCKET;
+      this.name = process.env.BOOSTID_SITE;
 
       try {
         this.containerId = fs.readFileSync('/etc/hostname', 'utf8').trim();
@@ -121,8 +121,8 @@ class ImageReporter {
         const url = `https://${this.bucket}.s3.amazonaws.com/${this.name}/${this.containerId}/index.html`;
         fs.outputFileSync('/tmp/boostid_test_results', url);
 
-        logger.info('View the visual regression results at:');
-        logger.info(url);
+        log.info('View the visual regression results at:');
+        log.info(url);
       })
       .catch(console.error);
     }

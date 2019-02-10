@@ -3,7 +3,7 @@
 const yargs = require('yargs/yargs');
 const packageJson = require('../package.json');
 // const { run } = require('../lib/utils');
-const logger = require('../lib/log');
+const log = require('../lib/log');
 const config = require('../lib/config');
 
 
@@ -14,21 +14,11 @@ const runModule = (path, method) => (argv) => {
   const res = (method ? require(path)[method](argv) : require(path)(argv));
   if (res instanceof Promise)
     res.catch((err) => {
-      logger.error(err);
+      log.error(err);
       process.exit(1);
     });
 };
 
-// const runScript = (cmd, args) => (argv) => {
-//   spawn(cmd, args ? args : argv._.slice(1), {
-//     stdio: 'inherit',
-//   });
-// };
-// const runScript = (path) => (argv) => run([ path, ...argv._.slice(1) ])
-// .catch((err) => {
-//   logger.error(err);
-//   process.exit(1);
-// });
 
 const commands = [{
   command: 'setup',
@@ -39,10 +29,10 @@ const commands = [{
   //   desc: 'Creates a new Pantheon site',
   // }),
   handler: runModule('../lib/setup'),
-}, {
-  command: 'check-local',
-  desc: 'Test if local environment is ready for development',
-  handler: runModule('../lib/local', 'devReady'),
+// }, {
+//   command: 'check-local',
+//   desc: 'Test if local environment is ready for development',
+//   handler: runModule('../lib/local', 'devReady'),
 }, {
   command: 'test',
   desc: 'Run coverage tests locally in a Docker container',
@@ -62,27 +52,54 @@ const commands = [{
   }),
   handler: runModule('../lib/test'),
 }, {
-  command: 'upstream-updates',
-  desc: 'Create "updates" multidev and apply upstream updates',
+  command: 'upstream-updates <multidev>',
+  desc: 'Create multidev as copy of "dev" and apply upstream updates',
   handler: runModule('../lib/update'),
 }, {
-  command: 'ter <cmd> [args ...]',
+  command: 'ci-update-envs',
+  desc: 'Update CircleCI environment variables',
+  handler: runModule('../lib/ci', 'updateEnvs'),
+}, {
+  command: 'ter <cmd> [args...]',
   desc: 'Run terminus commands',
+  builder: (_yargs) => _yargs
+  .coerce('cmd', (cmd) => {
+    if (cmd in require('../lib/terminus').commands()) return cmd;
+    else throw `${cmd} is not a valid command`;
+  })
+  .usage(`boostid ter <cmd>\n\nRun terminus commands. Available commands:\n${require('../lib/terminus').help()}`),
   handler: runModule('../lib/terminus', 'run'),
+// }, {
+//   command: 'trigger-circleci <branch>',
+//   desc: 'Trigger a build workflow in CircleCI',
+//   handler: runModule('../lib/circleci', 'triggerBuild'),
 }, {
-  command: 'trigger-circleci <branch>',
-  desc: 'Trigger a build workflow in CircleCI',
-  handler: runModule('../lib/circleci', 'triggerBuild'),
-}, {
-  command: 'config-get [key]',
-  desc: 'Prints config value for specified "key". Exclude "key" to get all config as json',
+  command: 'config',
+  desc: 'Read and write global config',
   example: 'boostid config-get session.user_id',
-  handler: runModule('../lib/config', 'getArg'),
-}, {
-  command: 'config-set <key> [value]',
-  desc: 'Set config value for specified "key". Exclude "value" to delete the key instead',
-  example: 'boostid config-set foo.bar biz',
-  handler: runModule('../lib/config', 'setArg'),
+  builder: (_yargs) => _yargs
+  .demandCommand(1, '')
+  .command({
+    command: 'get [key]',
+    desc: 'Prints config value for specified key. Exclude "key" to get all config as json',
+    handler: runModule('../lib/config', 'getArg'),
+  })
+  .command({
+    command: 'set <key> <value>',
+    desc: 'Set config value for specified key',
+    handler: runModule('../lib/config', 'setArg'),
+  })
+  .command({
+    command: 'delete [keys...]',
+    desc: 'Delete config value for specified key(s)',
+    handler: runModule('../lib/config', 'deleteArg'),
+  }),
+  // handler: runModule('../lib/config', 'getArg'),
+// }, {
+//   command: 'config-set <key> [value]',
+//   desc: 'Set config value for specified "key". Exclude "value" to delete the key instead',
+//   example: 'boostid config-set foo.bar biz',
+//   handler: runModule('../lib/config', 'setArg'),
 }];
 
 const program = (args) => {
@@ -91,8 +108,9 @@ const program = (args) => {
   .scriptName(packageJson.name)
   .usage('Command suite for Rootid development and testing\n\nUsage: $0 <command> [options]')
   .wrap(100)
-  .strict(true)
+  // .strict(true) // allow any options
   .demandCommand(1, '')
+  .env('BOOSTID')
   // .completion()
 
   // version
@@ -100,9 +118,16 @@ const program = (args) => {
   .alias('v', 'version')
 
   // help
-  .alias('h', 'help')
-  .command('help <command>', 'View help for a specific command', () => {}, (argv) => {
-    program([ argv.command, '-h' ]);
+  .help()
+  .alias('help', 'h')
+  .command({
+    command: 'help [command]',
+    desc: 'Output usage information',
+    handler: (argv) => {
+      const cmd = argv.command;
+      if (!cmd) program([ '-h' ]);
+      else program([ cmd, '-h' ]);
+    },
   })
 
   // global options
@@ -111,14 +136,14 @@ const program = (args) => {
     type: 'string',
     requiresArg: true,
     alias: 's',
-    defaultDescription: '$PANTHEON_SITE_NAME',
+    defaultDescription: '$BOOSTID_SITE',
   })
   .option('machine-token', {
     desc: 'Machine token for Terminus cli',
     type: 'string',
     requiresArg: true,
     alias: 'm',
-    defaultDescription: '$PANTHEON_MACHINE_TOKEN',
+    defaultDescription: '$BOOSTID_MACHINE_TOKEN',
   })
   .option('ci-token', {
     desc: 'CircleCI API user token',
