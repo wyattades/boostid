@@ -39,9 +39,10 @@ const log = require('../lib/log');
   let testResultsUrl;
   try {
     testResultsUrl = fs.readFileSync('/tmp/boostid_test_results', 'utf8').trim();
-  } catch (_) {}
+  } catch (_) { /**/ }
 
   await slack({ failed: true, testResultsUrl });
 
-  process.exit(1);
-});
+  throw '';
+})
+.catch(() => process.exit(1));
