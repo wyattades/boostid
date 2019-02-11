@@ -84,7 +84,7 @@ const commands = [{
   handler: runModule('../lib/update'),
 }, {
   command: 'ci-update-meta <git>',
-  desc: 'Update CircleCI environment variables of specified git url',
+  desc: 'Update CircleCI (specified by "git" url) environment variables and SSH keys',
   builder: (_yargs) => _yargs
   .option('slack-webhook', {
     desc: 'Slack webhook url',
@@ -116,7 +116,6 @@ const program = (args) => {
   .wrap(100)
   // .strict(true) // allow any options
   .demandCommand(1, '')
-  .env('BOOSTID')
   // .completion()
 
   // version
@@ -155,13 +154,13 @@ const program = (args) => {
     desc: 'CircleCI API user token',
     type: 'string',
     requiresArg: true,
+  })
+  .option('reponame', {
+    desc: 'Github repository name',
+    type: 'string',
+    requiresArg: true,
+    alias: 'n',
   });
-  // .option('reponame', {
-  //   desc: 'Github repository name',
-  //   type: 'string',
-  //   requiresArg: true,
-  //   alias: 'n',
-  // });
 
   // config file
   // .option('config', {
