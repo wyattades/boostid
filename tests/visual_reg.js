@@ -15,8 +15,6 @@ exports.visualReg = (pages, base) => {
 
       beforeAll(async () => {
         await page.goto(base + path, { waitUntil: 'networkidle0' });
-
-        // expect(page.url().startsWith(base + path)).toBeTruthy();
       }, 15000);
 
       for (const viewPort of viewPorts) {

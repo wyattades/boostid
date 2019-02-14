@@ -29,10 +29,10 @@ const commands = [{
   //   desc: 'Creates a new Pantheon site',
   // }),
   handler: runModule('../lib/setup'),
-// }, {
-//   command: 'check-local',
-//   desc: 'Test if local environment is ready for development',
-//   handler: runModule('../lib/local', 'devReady'),
+}, {
+  command: 'check-local',
+  desc: 'Test if local environment is ready for development',
+  handler: runModule('../lib/local', 'devReady'),
 }, {
   command: 'test',
   desc: 'Run coverage tests locally in a Docker container',
@@ -50,7 +50,11 @@ const commands = [{
     type: 'string',
     requiresArg: true,
   }),
-  handler: runModule('../lib/test'),
+  handler: runModule('../lib/test', 'coverage'),
+}, {
+  command: 'test-local',
+  desc: 'Test locally',
+  handler: runModule('../lib/test', 'ciLocal'),
 }, {
   command: 'config',
   desc: 'Read and write global config',
@@ -72,12 +76,6 @@ const commands = [{
     desc: 'Delete config value for specified key(s)',
     handler: runModule('../lib/config', 'deleteArg'),
   }),
-  // handler: runModule('../lib/config', 'getArg'),
-// }, {
-//   command: 'config-set <key> [value]',
-//   desc: 'Set config value for specified "key". Exclude "value" to delete the key instead',
-//   example: 'boostid config-set foo.bar biz',
-//   handler: runModule('../lib/config', 'setArg'),
 }, {
   command: 'upstream-updates <multidev>',
   desc: 'Create multidev as copy of "dev" and apply upstream updates',

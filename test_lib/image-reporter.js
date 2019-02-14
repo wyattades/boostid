@@ -94,38 +94,29 @@ class ImageReporter {
         }
       }
     }
+      
+    const resultsJson = JSON.stringify({
+      version: 1,
+      diffFiles,
+      testResults: results.testResults,
+    });
     
-    if (diffFiles.length) {
-      
-      let resultsJson;
-      try {
-        resultsJson = JSON.stringify({
-          version: 1,
-          diffFiles,
-          testResults: results.testResults,
-        });
-      } catch (err) {
-        console.error(err);
-      }
-      if (!resultsJson) resultsJson = '{}';
-      
-      Promise.all(diffFiles.map(({ filename }) => (
-        this.putFile(filename, 'image/png',
-          fs.readFileSync(`./__tests__/__image_snapshots__/__diff_output__/${filename}`))
-      )).concat([
-        this.putFile('index.html', 'text/html', this.visualRegHtml(diffFiles)),
-        this.putFile('results.json', 'application/json', resultsJson),
-      ]))
-      .then(() => {
-        console.log();
-        const url = `https://${this.bucket}.s3.amazonaws.com/${this.name}/${this.containerId}/index.html`;
-        fs.outputFileSync('/tmp/boostid_test_results', url);
+    Promise.all(diffFiles.map(({ filename }) => (
+      this.putFile(filename, 'image/png',
+        fs.readFileSync(`./__tests__/__image_snapshots__/__diff_output__/${filename}`))
+    )).concat([
+      this.putFile('index.html', 'text/html', this.visualRegHtml(diffFiles)),
+      this.putFile('results.json', 'application/json', resultsJson),
+    ]))
+    .then(() => {
+      console.log();
+      const url = `https://${this.bucket}.s3.amazonaws.com/${this.name}/${this.containerId}/index.html`;
+      fs.outputFileSync('/tmp/boostid_test_results', url);
 
-        log.info('View the visual regression results at:');
-        log.info(url);
-      })
-      .catch(console.error);
-    }
+      log.info('View the test results at:');
+      log.info(url);
+    })
+    .catch(console.error);
   }
 }
 
