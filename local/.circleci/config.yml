@@ -7,14 +7,13 @@ jobs:
       - image: wades/boostid:0.0.1
     working_directory: /app
     steps:
-      - checkout
-      # - add_ssh_keys
-      # - run:
-      #     name: Add Pantheon to known hosts (HACK)
-      #     command: ssh-keyscan -p 2222 -H codeserver.dev.${BOOSTID_ID}.drush.in >> ~/.ssh/known_hosts
-      # - run:
-      #     name: Checkout Pantheon repository
-      #     command: git clone ssh://codeserver.dev.${BOOSTID_ID}@codeserver.dev.${BOOSTID_ID}.drush.in:2222/~/repository.git .
+      - add_ssh_keys
+      - run:
+          name: Add Pantheon to known hosts (HACK)
+          command: ssh-keyscan -p 2222 -H codeserver.dev.${BOOSTID_ID}.drush.in >> ~/.ssh/known_hosts
+      - run:
+          name: Checkout Pantheon repository
+          command: git clone ssh://codeserver.dev.${BOOSTID_ID}@codeserver.dev.${BOOSTID_ID}.drush.in:2222/~/repository.git .
       - restore_cache:
           keys:
             # when lock file changes, use increasingly general patterns to restore cache
