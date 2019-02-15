@@ -152,13 +152,13 @@ const program = (args) => {
     desc: 'CircleCI API user token',
     type: 'string',
     requiresArg: true,
-  })
-  .option('reponame', {
-    desc: 'Github repository name',
-    type: 'string',
-    requiresArg: true,
-    alias: 'n',
   });
+  // .option('reponame', {
+  //   desc: 'Github repository name',
+  //   type: 'string',
+  //   requiresArg: true,
+  //   alias: 'n',
+  // });
 
   // config file
   // .option('config', {
