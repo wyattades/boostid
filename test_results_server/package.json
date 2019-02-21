@@ -1,0 +1,11 @@
+{
+  "name": "boostid-results",
+  "scripts": {
+    "deploy": "now && now alias && now rm boostid-results -y --safe"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.407.0",
+    "basic-auth": "^2.0.1"
+  },
+  "private": true
+}
