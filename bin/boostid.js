@@ -51,10 +51,10 @@ const commands = [{
     requiresArg: true,
   }),
   handler: runModule('../lib/test', 'coverage'),
-}, {
-  command: 'test-local',
-  desc: 'Test locally',
-  handler: runModule('../lib/test', 'ciLocal'),
+// }, {
+//   command: 'test-local',
+//   desc: 'Test locally',
+//   handler: runModule('../lib/test', 'ciLocal'),
 }, {
   command: 'config',
   desc: 'Read and write global config',

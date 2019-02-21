@@ -8,5 +8,4 @@ module.exports = {
   globalTeardown: 'jest-environment-puppeteer/teardown',
   testEnvironment: 'jest-environment-puppeteer',
   setupFilesAfterEnv: [ path.resolve(__dirname, 'setup-test.js') ],
-  reporters: [ 'default', path.resolve(__dirname, 'image-reporter.js') ],
 };
