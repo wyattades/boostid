@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "boostid-results",
   "alias": "boostid-results",
   "builds": [{ "src": "index.js", "use": "@now/node" }],
   "routes": [{ "src": "/(.*)", "dest": "/" }]

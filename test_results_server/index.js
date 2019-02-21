@@ -46,17 +46,17 @@ const render = (title, content) => `
 </html>
 `;
 
-const renderResults = (bucket, name, testId, results) => {
+const renderResults = (bucket, name, testId, { testResults, timestamp, ciJob }) => {
   const diffFiles = [];
   // for each file
-  for (const { testResults } of results.testResults) {
+  for (const { assertionResults } of testResults.testResults) {
     // for each test in that file
-    for (const testResult of testResults) {
-      if (testResult.failureMessages && testResult.failureMessages.length) {
-        const match = testResult.failureMessages[0].match(/__diff_output__\/([^\s]+-diff\.png)/);
+    for (const assertResult of assertionResults) {
+      if (assertResult.failureMessages && assertResult.failureMessages.length) {
+        const match = assertResult.failureMessages[0].match(/__diff_output__\/([^\s]+-diff\.png)/);
         if (match) {
           diffFiles.push({
-            label: testResult.ancestorTitles.concat([testResult.title]).join(' <strong>»</strong> '),
+            label: assertResult.ancestorTitles.concat([ assertResult.title ]).join(' <strong>»</strong> '),
             filename: `https://${bucket}.s3.amazonaws.com/${name}/${testId}/${match[1]}`,
           });
         }
@@ -68,8 +68,8 @@ const renderResults = (bucket, name, testId, results) => {
   <p><strong>Bucket:</strong> <a href="..">${bucket}</a></p>
   <p><strong>Sitename:</strong> <a href=".">${name}</a></p>
   <p><strong>Test ID:</strong> ${testId}</p>
-  ${results.timestamp ? `<p><strong>Timestamp:</strong> ${new Date(results.timestamp)}</p>` : ''}
-  ${results.ciJob ? `<p><strong>CI Job Number:</strong> ${results.ciJob}</p>` : ''}
+  ${timestamp ? `<p><strong>Timestamp:</strong> ${new Date(timestamp).toUTCString()}</p>` : ''}
+  ${ciJob ? `<p><strong>CI Job Number:</strong> ${ciJob}</p>` : ''}
   <hr/>
   ${diffFiles.map(({ filename, label }) => `
   <div>
@@ -86,7 +86,8 @@ const handle = async (req, res) => {
   if (!credentials || !credentials.name || !credentials.pass || credentials.name === 'invalidate') {
     res.statusCode = 401;
     res.setHeader('WWW-Authenticate', 'Basic realm="example"');
-    res.end('Access Denied. Refresh to try again\n\nUse your AWS access key id and secret access key as the username and password respectively');
+    res.end('Access Denied. Refresh to try again\n\nUse your AWS access key id \
+and secret access key as the username and password respectively');
     return;
   }
 
@@ -126,7 +127,11 @@ const handle = async (req, res) => {
     .promise()
     .then((list) => {
 
-      const content = list.CommonPrefixes.map((dir) => `<p><a href="/${Bucket}/${project}/${dir.Prefix.split('/')[1]}">${dir.Prefix.split('/')[1]}</a></p>`);
+      const content = list.CommonPrefixes.map((dir) => {
+        const _testId = Number.parseInt(dir.Prefix.split('/')[1], 10);
+
+        return `<p><a href="/${Bucket}/${project}/${_testId}">${new Date(_testId).toUTCString()}</a></p>`;
+      });
 
       res.end(render(`"${project}" Tests`, content.join('')));
     });
@@ -145,7 +150,7 @@ const handle = async (req, res) => {
     } catch (_) {}
 
     if (json) {
-      if (q.json) {
+      if (q.json !== undefined) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(json, null, 2));
       } else

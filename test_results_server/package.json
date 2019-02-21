@@ -1,5 +1,4 @@
 {
-  "name": "boostid-results",
   "scripts": {
     "deploy": "now && now alias && now rm boostid-results -y --safe"
   },
