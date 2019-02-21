@@ -16,7 +16,7 @@ const render = (title, content) => `
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Test Results</title>
+  <title>${title}</title>
   <style>
     html {
       font-family: Verdana, Geneva, sans-serif;
@@ -24,6 +24,9 @@ const render = (title, content) => `
     img {
       width: 100%;
       border: 2px solid black;
+    }
+    .error {
+      color: #e03121;
     }
   </style>
 </head>
@@ -46,7 +49,7 @@ const render = (title, content) => `
 </html>
 `;
 
-const renderResults = (bucket, name, testId, { testResults, timestamp, ciJob }) => {
+const renderResults = (bucket, name, testId, { testResults, timestamp, ciJob, ciUrl = '' }) => {
   const diffFiles = [];
   // for each file
   for (const { assertionResults } of testResults.testResults) {
@@ -65,11 +68,11 @@ const renderResults = (bucket, name, testId, { testResults, timestamp, ciJob }) 
   }
 
   return `
-  <p><strong>Bucket:</strong> <a href="..">${bucket}</a></p>
-  <p><strong>Sitename:</strong> <a href=".">${name}</a></p>
+  <p><strong>Bucket:</strong> <a href="/${bucket}">${bucket}</a></p>
+  <p><strong>Project:</strong> <a href="/${bucket}/${name}">${name}</a></p>
   <p><strong>Test ID:</strong> ${testId}</p>
   ${timestamp ? `<p><strong>Timestamp:</strong> ${new Date(timestamp).toUTCString()}</p>` : ''}
-  ${ciJob ? `<p><strong>CI Job Number:</strong> ${ciJob}</p>` : ''}
+  ${ciJob ? `<p><strong>CI Job Number:</strong> <a href="${ciUrl}">${ciJob}</a></p>` : ''}
   <hr/>
   ${diffFiles.map(({ filename, label }) => `
   <div>
@@ -165,6 +168,6 @@ module.exports = (req, res) => {
   handle(req, res)
   .catch((err) => {
     res.statusCode = 500;
-    res.end(render('Error', `<p>${err.toString()}</p>`));
+    res.end(render('Error', `<p class="error">${err.toString()}</p>`));
   });
 };
