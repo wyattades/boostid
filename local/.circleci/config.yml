@@ -55,8 +55,8 @@ jobs:
                 command: ./node_modules/boostid/scripts/run-tests.sh
             - run:
                 name: Reporter
-                command: node ./node_modules/boostid/lib/reporter.js failed
-                when: on_fail
+                command: node ./node_modules/boostid/lib/reporter.js
+                when: always
       - store_artifacts:
           path: /tmp/boostid_results_url
           destination: boostid_results_url
