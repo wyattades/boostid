@@ -25,9 +25,6 @@ const commands = [{
   desc: 'Setup a Pantheon site for development with Boostid',
   builder: (_yargs) => _yargs
   .require('site'),
-  // .option('new', {
-  //   desc: 'Creates a new Pantheon site',
-  // }),
   handler: runModule('../lib/setup'),
 }, {
   command: 'check-local',
@@ -61,6 +58,8 @@ const commands = [{
   example: 'boostid config-get session.user_id',
   builder: (_yargs) => _yargs
   .demandCommand(1, '')
+  .example('boostid config get aws.my_bucket.accessKey')
+  .example('boostid config set aws.my_bucket.secretAccessKey supersecret')
   .command({
     command: 'get [key]',
     desc: 'Prints config value for specified key. Exclude "key" to get all config as json',
@@ -100,10 +99,13 @@ const commands = [{
   })
   .usage(`boostid ter <cmd>\n\nRun terminus commands. Available commands:\n${require('../lib/terminus').help()}`),
   handler: runModule('../lib/terminus', 'run'),
-  // }, {
-  //   command: 'trigger-circleci <branch>',
-  //   desc: 'Trigger a build workflow in CircleCI',
-  //   handler: runModule('../lib/circleci', 'triggerBuild'),
+}, {
+  command: 'ci-trigger <git>',
+  desc: 'Trigger CircleCI workflows for specified "git" url',
+  builder: (_yargs) => _yargs
+  .example('boostid ci-trigger https://github.com/wyattades/my_project#master')
+  .default('branch', 'master'),
+  handler: runModule('../lib/ci', 'trigger'),
 }];
 
 const program = (args) => {
@@ -153,25 +155,6 @@ const program = (args) => {
     type: 'string',
     requiresArg: true,
   });
-  // .option('reponame', {
-  //   desc: 'Github repository name',
-  //   type: 'string',
-  //   requiresArg: true,
-  //   alias: 'n',
-  // });
-
-  // config file
-  // .option('config', {
-  //   desc: 'Path to custom config file',
-  //   type: 'string',
-  //   requiresArg: true,
-  //   default: 'boostid.config.js',
-  //   alias: 'c',
-  //   coerce: (filename) => {
-  //     config.setFilename(filename);
-  //     return filename;
-  //   },
-  // });
 
   // commands
   for (const cmd of commands) parser.command(cmd);
