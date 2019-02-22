@@ -1,5 +1,5 @@
 const tests = require('boostid/tests');
-const config = require('../boostid.config');
+const config = require('boostid/lib/config').init();
 
 
 describe('Visual regression on "dev"', () => {

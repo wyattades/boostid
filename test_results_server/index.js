@@ -72,7 +72,7 @@ const renderResults = (bucket, name, testId, { testResults, timestamp, ciJob, ci
   <p><strong>Project:</strong> <a href="/${bucket}/${name}">${name}</a></p>
   <p><strong>Test ID:</strong> ${testId}</p>
   ${timestamp ? `<p><strong>Timestamp:</strong> ${new Date(timestamp).toUTCString()}</p>` : ''}
-  ${ciJob ? `<p><strong>CI Job Number:</strong> <a href="${ciUrl}">${ciJob}</a></p>` : ''}
+  ${ciJob ? `<p><strong>CI Job:</strong> <a href="${ciUrl}">${ciJob}</a></p>` : ''}
   <hr/>
   ${diffFiles.map(({ filename, label }) => `
   <div>

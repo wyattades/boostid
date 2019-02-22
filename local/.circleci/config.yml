@@ -6,14 +6,27 @@ jobs:
     docker:
       - image: wades/boostid:0.0.1
     working_directory: /app
+    parameters:
+      just_tests:
+        type: boolean
+        default: false
+      use_checkout:
+        type: boolean
+        default: true
     steps:
       - add_ssh_keys
-      - run:
-          name: Add Pantheon to known hosts (HACK)
-          command: ssh-keyscan -p 2222 -H codeserver.dev.${BOOSTID_ID}.drush.in >> ~/.ssh/known_hosts
-      - run:
-          name: Checkout Pantheon repository
-          command: git clone ssh://codeserver.dev.${BOOSTID_ID}@codeserver.dev.${BOOSTID_ID}.drush.in:2222/~/repository.git .
+      - when:
+          condition: <<parameters.use_checkout>>
+          steps:
+            - checkout
+      - unless:
+          condition: <<parameters.use_checkout>>
+          steps:
+            - run:
+                name: Checkout Pantheon repository
+                command: |
+                  ssh-keyscan -p 2222 -H codeserver.dev.${BOOSTID_ID}.drush.in >> ~/.ssh/known_hosts
+                  git clone ssh://codeserver.dev.${BOOSTID_ID}@codeserver.dev.${BOOSTID_ID}.drush.in:2222/~/repository.git .
       - restore_cache:
           keys:
             # when lock file changes, use increasingly general patterns to restore cache
@@ -27,21 +40,34 @@ jobs:
       - save_cache:
           key: node-v1-{{ .Branch }}-{{ checksum "package-lock.json" }}
           paths:
-            - /app/node_modules
-      - run:
-          name: Run updates and coverage tests
-          command: ./node_modules/boostid/scripts/run-updates.js
+            - ./node_modules
+      - unless:
+          condition: <<parameters.just_tests>>
+          steps:
+            - run:
+                name: Run updates and coverage tests
+                command: ./node_modules/boostid/scripts/run-updates.js
+      - when:
+          condition: <<parameters.just_tests>>
+          steps:
+            - run:
+                name: Run coverage tests
+                command: ./node_modules/boostid/scripts/run-tests.sh
+            - run:
+                name: Reporter
+                command: node ./node_modules/boostid/lib/reporter.js failed
+                when: on_fail
       - store_artifacts:
-          path: /tmp/boostid_test_results
-          destination: boostid_test_results
+          path: /tmp/boostid_results_url
+          destination: boostid_results_url
 
 
 workflows:
-  version: 2.1
-
   nightly:
     jobs:
       - upstream_updates:
+          use_checkout: false
+          just_tests: true
           filters:
             branches:
               only: master

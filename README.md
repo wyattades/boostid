@@ -90,3 +90,15 @@ View full [docs](docs/visual_regression.md) -->
 **Jest Testing with Puppeteer**
 - https://www.npmjs.com/package/jest-environment-puppeteer
 - https://www.npmjs.com/package/jest-image-snapshot
+
+## Testing with Jest
+
+Any `.js` files in the `__tests__` directory of your project will be run as [Jest tests](https://jestjs.io/docs/en/getting-started).
+
+A few Puppeteer global variables are provided for convenience: `browser`, `context`, and a default `page`.
+(Note: You can disable the default Puppeteer environment by adding the following docblock to the top of your test file)
+```js
+/**
+ * @jest-environment node
+ */
+```
