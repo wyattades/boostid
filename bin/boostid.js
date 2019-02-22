@@ -48,10 +48,6 @@ const commands = [{
     requiresArg: true,
   }),
   handler: runModule('../lib/test', 'coverage'),
-// }, {
-//   command: 'test-local',
-//   desc: 'Test locally',
-//   handler: runModule('../lib/test', 'ciLocal'),
 }, {
   command: 'config',
   desc: 'Read and write global config',
@@ -80,6 +76,16 @@ const commands = [{
   desc: 'Create multidev as copy of "dev" and apply upstream updates',
   handler: runModule('../lib/update'),
 }, {
+  command: 'ter <cmd> [args...]',
+  desc: 'Run terminus commands',
+  builder: (_yargs) => _yargs
+  .coerce('cmd', (cmd) => {
+    if (cmd in require('../lib/terminus').commands()) return cmd;
+    else throw `${cmd} is not a valid command`;
+  })
+  .usage(`boostid ter <cmd>\n\nRun terminus commands. Available commands:\n${require('../lib/terminus').help()}`),
+  handler: runModule('../lib/terminus', 'run'),
+}, {
   command: 'ci-update-meta <git>',
   desc: 'Update CircleCI (specified by "git" url) environment variables and SSH keys',
   builder: (_yargs) => _yargs
@@ -90,15 +96,11 @@ const commands = [{
   }),
   handler: runModule('../lib/ci', 'updateMeta'),
 }, {
-  command: 'ter <cmd> [args...]',
-  desc: 'Run terminus commands',
-  builder: (_yargs) => _yargs
-  .coerce('cmd', (cmd) => {
-    if (cmd in require('../lib/terminus').commands()) return cmd;
-    else throw `${cmd} is not a valid command`;
-  })
-  .usage(`boostid ter <cmd>\n\nRun terminus commands. Available commands:\n${require('../lib/terminus').help()}`),
-  handler: runModule('../lib/terminus', 'run'),
+  command: 'ci-local <job>',
+  // builder: (_yargs) => _yargs
+  // .default('job', 'upstream_updates'),
+  desc: 'Run CircleCI job locally using Docker',
+  handler: runModule('../lib/test', 'ciLocal'),
 }, {
   command: 'ci-trigger <git>',
   desc: 'Trigger CircleCI workflows for specified "git" url',
