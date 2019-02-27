@@ -3,6 +3,7 @@
     "deploy": "now && now alias && now rm boostid-results -y --safe"
   },
   "dependencies": {
+    "ansi-to-html": "^0.6.10",
     "aws-sdk": "^2.407.0",
     "basic-auth": "^2.0.1"
   },

@@ -1,9 +1,15 @@
 const auth = require('basic-auth');
 const URL = require('url');
 const querystring = require('querystring');
+const AnsiToHtml = require('ansi-to-html');
 require('aws-sdk/global');
 const S3 = require('aws-sdk/clients/s3');
 
+
+const ansiToHtml = new AnsiToHtml({
+  fg: '#000',
+  bg: '#FFF',
+});
 
 const s3 = new S3({
   apiVersion: '2006-03-01',
@@ -21,9 +27,19 @@ const render = (title, content) => `
     html {
       font-family: Verdana, Geneva, sans-serif;
     }
+    body {
+      padding: 0;
+      margin: 16px;
+    }
     img {
       width: 100%;
       border: 2px solid black;
+    }
+    pre {
+      margin: 0;
+      padding: 20px;
+      background: #eee;
+      white-space: pre-wrap;
     }
     .error {
       color: #e03121;
@@ -51,16 +67,18 @@ const render = (title, content) => `
 
 const renderResults = (bucket, name, testId, { testResults, timestamp, ciJob, ciUrl = '' }) => {
   const diffFiles = [];
+
   // for each file
   for (const { assertionResults } of testResults.testResults) {
+
     // for each test in that file
     for (const assertResult of assertionResults) {
       if (assertResult.failureMessages && assertResult.failureMessages.length) {
-        const match = assertResult.failureMessages[0].match(/__diff_output__\/([^\s]+-diff\.png)/);
+        const match = assertResult.failureMessages[0].match(/__diff_output__\/([^\s]+?-diff\.png)/);
         if (match) {
           diffFiles.push({
-            label: assertResult.ancestorTitles.concat([ assertResult.title ]).join(' <strong>»</strong> '),
-            filename: `https://${bucket}.s3.amazonaws.com/${name}/${testId}/${match[1]}`,
+            label: assertResult.ancestorTitles.concat([ assertResult.title ]),
+            filename: `https://${bucket}.s3.amazonaws.com/${name}/${testId}/${encodeURIComponent(match[1])}`,
           });
         }
       }
@@ -68,17 +86,23 @@ const renderResults = (bucket, name, testId, { testResults, timestamp, ciJob, ci
   }
 
   return `
-  <p><strong>Bucket:</strong> <a href="/${bucket}">${bucket}</a></p>
-  <p><strong>Project:</strong> <a href="/${bucket}/${name}">${name}</a></p>
-  <p><strong>Test ID:</strong> ${testId}</p>
-  ${timestamp ? `<p><strong>Timestamp:</strong> ${new Date(timestamp).toUTCString()}</p>` : ''}
-  ${ciJob ? `<p><strong>CI Job:</strong> <a href="${ciUrl}">${ciJob}</a></p>` : ''}
-  <hr/>
-  ${diffFiles.map(({ filename, label }) => `
-  <div>
-    <p><strong>Test:</strong> ${label}</p>
-    <a href="${filename}" target="_blank"><img src="${filename}"/></a>
-  </div>`).join('<hr/>')}
+<p><strong>Bucket:</strong> <a href="/${bucket}">${bucket}</a></p>
+<p><strong>Project:</strong> <a href="/${bucket}/${name}">${name}</a></p>
+<p><strong>Test ID:</strong> ${testId}</p>
+${timestamp ? `<p><strong>Timestamp:</strong> ${new Date(timestamp).toUTCString()}</p>` : ''}
+${ciJob ? `<p><strong>CI Job:</strong> <a href="${ciUrl}">${ciJob}</a></p>` : ''}
+<hr/>
+<h2>Test Results</h2>
+${testResults.testResults.map(({ name, message }) => `
+  <p>${name}</p>
+  <pre>${ansiToHtml.toHtml(message || '')}</pre>`)}
+<h2>Visual Regression Mismatches</h2>
+<p>${diffFiles.length} Mismatches</p>
+${diffFiles.map(({ filename, label }) => `
+<div>
+  <p><strong>Test:</strong> ${label.join(' <strong>»</strong> ')}</p>
+  <a href="${filename}" target="_blank"><img src="${filename}"/></a>
+</div>`).join('<hr/>')}
   `;
 };
 
@@ -110,54 +134,50 @@ and secret access key as the username and password respectively');
   if (!Bucket) {
     throw 'Must specify a bucket in the url e.g. /my_bucket_name</p>';
   } else if (!project) {
-    await s3.listObjects({
+    const list = await s3.listObjects({
       Bucket,
       Delimiter: '/',
     })
-    .promise()
-    .then((list) => {
+    .promise();
 
-      const content = list.CommonPrefixes.map((dir) => `<p><a href="/${Bucket}/${dir.Prefix.slice(0, -1)}">${dir.Prefix.slice(0, -1)}</a></p>`);
+    const content = list.CommonPrefixes.map((dir) => `<p><a href="/${Bucket}/${dir.Prefix.slice(0, -1)}">${dir.Prefix.slice(0, -1)}</a></p>`);
 
-      res.end(render('Projects', content.join('')));
-    });
+    res.end(render('Projects', content.join('')));
   } else if (!testId) {
-    await s3.listObjects({
+    const list = await s3.listObjects({
       Bucket,
       Prefix: `${project}/`,
       Delimiter: '/',
     })
-    .promise()
-    .then((list) => {
+    .promise();
 
-      const content = list.CommonPrefixes.map((dir) => {
-        const _testId = Number.parseInt(dir.Prefix.split('/')[1], 10);
+    const content = list.CommonPrefixes.map((dir) => {
+      const _testId = Number.parseInt(dir.Prefix.split('/')[1], 10);
 
-        return `<p><a href="/${Bucket}/${project}/${_testId}">${new Date(_testId).toUTCString()}</a></p>`;
-      });
-
-      res.end(render(`"${project}" Tests`, content.join('')));
+      return `<p><a href="/${Bucket}/${project}/${_testId}">${new Date(_testId).toUTCString()}</a></p>`;
     });
+
+    res.end(render(`"${project}" Tests`, content.join('')));
   } else {
 
-    const str = await s3.getObject({
+    const obj = await s3.getObject({
       Bucket,
       Key: `${project}/${testId}/results.json`,
     })
-    .promise()
-    .then((obj) => obj.Body.toString());
+    .promise();
 
     let json;
     try {
-      json = JSON.parse(str);
+      json = JSON.parse(obj.Body.toString());
     } catch (_) {}
 
     if (json) {
       if (q.json !== undefined) {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(json, null, 2));
-      } else
+      } else {
         res.end(render('Visual Regression Results', renderResults(Bucket, project, testId, json)));
+      }
     } else
       throw 'Results not found';
   }
