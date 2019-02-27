@@ -40,24 +40,24 @@ Command suite for Rootid development and testing
 Usage: boostid <command> [options]
 
 Commands:
-  boostid help <command>               View help for a specific command
+  boostid help [command]               Output usage information
   boostid setup                        Setup a Pantheon site for development with Boostid
   boostid check-local                  Test if local environment is ready for development
   boostid test                         Run coverage tests locally in a Docker container
-  boostid upstream-updates <multidev>  Create multidev and apply upstream updates
-  boostid ter <cmd> [args ...]         Run terminus commands
-  boostid trigger-circleci <branch>    Trigger a build workflow in CircleCI
-  boostid config-get [key]             Prints config value for specified "key". Exclude "key" to get
-                                       all config as json
-  boostid config-set <key> [value]     Set config value for specified "key". Exclude "value" to delete
-                                       the key instead
+  boostid config                       Read and write global config
+  boostid upstream-updates <multidev>  Create multidev as copy of "dev" and apply upstream updates
+  boostid ter <cmd> [args...]          Run terminus commands
+  boostid ci-update-meta <git>         Update CircleCI (specified by "git" url) environment
+                                       variables and SSH keys
+  boostid ci-local <job>               Run CircleCI job locally using Docker
+  boostid ci-trigger <git>             Trigger CircleCI workflows for specified "git" url
 
 Options:
-  --site, -s           Manually set pantheon site name       [string] [default: $PANTHEON_SITE_NAME]
-  --machine-token, -m  Machine token for Terminus cli    [string] [default: $PANTHEON_MACHINE_TOKEN]
+  --help, -h           Show help                                                           [boolean]
+  --site, -s           Manually set pantheon site name             [string] [default: $BOOSTID_SITE]
+  --machine-token, -m  Machine token for Terminus cli     [string] [default: $BOOSTID_MACHINE_TOKEN]
   --ci-token           CircleCI API user token                                              [string]
   -v, --version        Show version number                                                 [boolean]
-  -h, --help           Show help  
 ```
 
 ## Config File
