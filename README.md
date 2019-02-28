@@ -54,8 +54,8 @@ Commands:
 
 Options:
   --help, -h           Show help                                                           [boolean]
-  --site, -s           Manually set pantheon site name             [string] [default: $BOOSTID_SITE]
-  --machine-token, -m  Machine token for Terminus cli     [string] [default: $BOOSTID_MACHINE_TOKEN]
+  --site, -s           Manually set pantheon site name                                      [string]
+  --machine-token, -m  Machine token for Terminus cli                                       [string]
   --ci-token           CircleCI API user token                                              [string]
   -v, --version        Show version number                                                 [boolean]
 ```
@@ -90,6 +90,7 @@ View full [docs](docs/visual_regression.md) -->
 **Jest Testing with Puppeteer**
 - https://www.npmjs.com/package/jest-environment-puppeteer
 - https://www.npmjs.com/package/jest-image-snapshot
+- https://www.npmjs.com/package/expect-puppeteer
 
 ## Testing with Jest
 
