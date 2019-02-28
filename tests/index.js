@@ -1,2 +1,5 @@
-const visual_reg = require('./visual_reg');
-module.exports = { ...visual_reg };
+module.exports = {
+  ...require('./visual_reg'),
+  ...require('./drupal'),
+  ...require('./utils'),
+};
