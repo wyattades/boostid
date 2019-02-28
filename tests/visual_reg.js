@@ -1,6 +1,8 @@
 const URL = require('url');
 
 
+const TEST_RESULTS_DIR = '__boostid_results__';
+
 /**
  * @typedef ViewPortConfig
  * @property {number} width
@@ -69,6 +71,7 @@ exports.visualReg = (targetUrl, devUrl, pages) => {
                   const image = await element.screenshot();
                   expect(image).toMatchImageSnapshot({
                     ...snapshotConfig,
+                    customDiffDir: TEST_RESULTS_DIR,
                     customSnapshotIdentifier: encodeURIComponent(`${path}--${viewPortKey}--${sel}`),
                   });
                 });

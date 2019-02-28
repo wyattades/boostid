@@ -7,5 +7,5 @@ module.exports = {
   globalSetup: 'jest-environment-puppeteer/setup',
   globalTeardown: 'jest-environment-puppeteer/teardown',
   testEnvironment: 'jest-environment-puppeteer',
-  setupFilesAfterEnv: [ path.resolve(__dirname, 'setup-test.js') ],
+  setupFilesAfterEnv: [ path.resolve(__dirname, 'setup-test.js'), 'expect-puppeteer' ],
 };

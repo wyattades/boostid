@@ -36,15 +36,20 @@ const commands = [{
   builder: (_yargs) => _yargs
   // .choices('type', ['all', 'visualreg', 'coverage'])
   // .default('type', 'all')
-  .option('results', {
-    desc: 'Local path to store test results. Set to "S3" if you want the results uploaded online',
-    type: 'string',
-    default: './__image_snapshots__',
-    requiresArg: true,
+  .usage(`boostid test\n\nRun coverage tests locally in a Docker container\n\n\
+By default, save test results locally in the directory "__boostid_results__"`)
+  .option('s3', {
+    desc: 'Upload results to AWS S3 bucket',
+    type: 'boolean',
+  })
+  .option('no-save', {
+    desc: 'Don\'t save test results locally',
+    type: 'boolean',
   })
   .option('dev-boostid', {
     desc: 'FOR DEVELOPMENT ONLY: Path to a local "boostid" repository',
     type: 'string',
+    hidden: true,
     requiresArg: true,
   }),
   handler: runModule('../lib/test', 'coverage'),
@@ -100,7 +105,7 @@ const commands = [{
   // builder: (_yargs) => _yargs
   // .default('job', 'upstream_updates'),
   desc: 'Run CircleCI job locally using Docker',
-  handler: runModule('../lib/test', 'ciLocal'),
+  handler: runModule('../lib/ci', 'ciLocal'),
 }, {
   command: 'ci-trigger <git>',
   desc: 'Trigger CircleCI workflows for specified "git" url',
@@ -143,14 +148,12 @@ const program = (args) => {
     type: 'string',
     requiresArg: true,
     alias: 's',
-    defaultDescription: '$BOOSTID_SITE',
   })
   .option('machine-token', {
     desc: 'Machine token for Terminus cli',
     type: 'string',
     requiresArg: true,
     alias: 'm',
-    defaultDescription: '$BOOSTID_MACHINE_TOKEN',
   })
   .option('ci-token', {
     desc: 'CircleCI API user token',

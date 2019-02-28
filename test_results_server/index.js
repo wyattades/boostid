@@ -74,7 +74,7 @@ const renderResults = (bucket, name, testId, { testResults, timestamp, ciJob, ci
     // for each test in that file
     for (const assertResult of assertionResults) {
       if (assertResult.failureMessages && assertResult.failureMessages.length) {
-        const match = assertResult.failureMessages[0].match(/__diff_output__\/([^\s]+?-diff\.png)/);
+        const match = assertResult.failureMessages[0].match(/([^\s/]+?-diff\.png)/);
         if (match) {
           diffFiles.push({
             label: assertResult.ancestorTitles.concat([ assertResult.title ]),
