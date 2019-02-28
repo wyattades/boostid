@@ -63,7 +63,7 @@ jobs:
 
 
 workflows:
-  nightly:
+  commit:
     jobs:
       - upstream_updates:
           use_checkout: false
@@ -71,11 +71,16 @@ workflows:
           filters:
             branches:
               only: master
-
-    # triggers:
-    #   - schedule:
-    #       cron: "0 0 * * *" # Every day at 12:00am UTC
-    #       filters:
-    #         branches:
-    #           only:
-    #             - master
+              
+  nightly:
+    jobs:
+      - upstream_updates:
+          use_checkout: false
+          just_tests: false
+    triggers:
+      - schedule:
+          cron: "0 0 * * *" # Every day at 12:00am UTC
+          filters:
+            branches:
+              only:
+                - master
