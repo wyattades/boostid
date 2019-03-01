@@ -44,13 +44,17 @@ exports.visualReg = (targetUrl, devUrl, pages) => {
               beforeAll(async () => {
                 await page.setViewport(viewPort);
 
-                await page.evaluate((_ignore) => {
-                  for (const sel of _ignore) {
-                    document.querySelectorAll(sel).forEach((el) => {
-                      el.style.visibility = 'hidden';
-                    });
-                  }
-                }, ignore);
+                try {
+                  await page.evaluate((_ignore) => {
+                    for (const sel of _ignore) {
+                      document.querySelectorAll(sel).forEach((el) => {
+                        el.style.visibility = 'hidden';
+                      });
+                    }
+                  }, ignore);
+                } catch (err) {
+                  console.log('Failed to hide elements', err.toString());
+                }
               }, 15000);
 
               for (let sel of elements) {
