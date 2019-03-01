@@ -17,7 +17,8 @@ const log = require('../lib/log');
   await update({ multidev });
 
   log.info('Running coverage tests');
-  await run(`./node_modules/boostid/scripts/run-tests.sh`);
+  // Make sure BOOSTID_* env vars are passed down
+  await run(`./node_modules/boostid/scripts/run-tests.sh`, false, { env: process.env });
 
   log.info('Merging multidev to dev');
   await ter.multidevMergeToDev(multidev);
