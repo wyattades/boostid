@@ -23,6 +23,7 @@ const render = (title, content) => `
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>${title}</title>
+  <link rel="icon" type="image/png" href="https://www.b-bets.com/images/auction/auctioninfo.png">
   <style>
     html {
       font-family: Verdana, Geneva, sans-serif;
@@ -77,7 +78,7 @@ const renderResults = (bucket, name, testId, { testResults, timestamp, ciJob, ci
         const match = assertResult.failureMessages[0].match(/([^\s/]+?-diff\.png)/);
         if (match) {
           diffFiles.push({
-            label: assertResult.ancestorTitles.concat([ assertResult.title ]),
+            label: assertResult.ancestorTitles.slice(1).concat([ assertResult.title ]),
             filename: `https://${bucket}.s3.amazonaws.com/${name}/${testId}/${encodeURIComponent(match[1])}`,
           });
         }
@@ -157,7 +158,8 @@ and secret access key as the username and password respectively');
       return `<p><a href="/${Bucket}/${project}/${_testId}">${new Date(_testId).toUTCString()}</a></p>`;
     });
 
-    res.end(render(`"${project}" Tests`, content.join('')));
+    res.end(render(`"${project}" Tests`, content.join('')
+     + `<br/><br/><p>To delete old tests, go to the <a href="https://s3.console.aws.amazon.com/s3/buckets/${Bucket}">AWS console</a></p>`));
   } else {
 
     const obj = await s3.getObject({
