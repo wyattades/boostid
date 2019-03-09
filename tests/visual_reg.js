@@ -55,7 +55,7 @@ exports.visualReg = (targetUrl, devUrl, pages) => {
                 } catch (err) {
                   console.log('Failed to hide elements', err.toString());
                 }
-              }, 15000);
+              }, 30000);
 
               for (let sel of elements) {
 
@@ -78,7 +78,7 @@ exports.visualReg = (targetUrl, devUrl, pages) => {
                     customDiffDir: TEST_RESULTS_DIR,
                     customSnapshotIdentifier: encodeURIComponent(`${path}--${viewPortKey}--${sel}`),
                   });
-                });
+                }, 20000);
               }
             });
           }
