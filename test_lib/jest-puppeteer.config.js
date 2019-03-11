@@ -7,5 +7,6 @@ module.exports = {
 
 if (process.env.BOOSTID_DEV) {
   module.exports.launch.headless = false;
-  module.exports.launch.slowMo = 100;
+  if (process.env.BOOSTID_DEV === 'slow')
+    module.exports.launch.slowMo = 100;
 }
