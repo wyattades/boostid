@@ -2,10 +2,30 @@ const tests = require('boostid/tests');
 const config = require('../boostid.config');
 
 
-const testerSite = `https://${config.multidev}-${config.name}.pantheonsite.io`;
+const base = {
+  viewPorts: [
+    { width: 1920, height: 1080 },
+    { width: 500, height: 800, isMobile: true },
+  ],
+};
 
 tests.visualReg(
   `https://dev-${config.name}.pantheonsite.io`,
-  testerSite,
-  config.pages,
+  `https://${config.multidev}-${config.name}.pantheonsite.io`,
+  [{
+    ...base,
+    path: '/',
+    ignore: [
+      'iframe[src*="youtube"]',
+    ],
+    elements: [
+      'body',
+    ],
+  }, {
+    ...base,
+    path: '/404',
+    elements: [
+      'body',
+    ],
+  }],
 );
