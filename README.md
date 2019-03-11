@@ -46,7 +46,7 @@ Commands:
   boostid test                         Run coverage tests locally in a Docker container
   boostid config                       Read and write global config
   boostid upstream-updates <multidev>  Create multidev as copy of "dev" and apply upstream updates
-  boostid ter <cmd> [args...]          Run terminus commands
+  boostid ter <cmd> [args...]          Run terminus commands for current site
   boostid ci-update-meta <git>         Update CircleCI (specified by "git" url) environment
                                        variables and SSH keys
   boostid ci-local <job>               Run CircleCI job locally using Docker
@@ -64,14 +64,11 @@ Options:
 
 There should be a file __boostid.config.js__ in your project root.
 
-It must export an object with the following properties:
+It should export an object with the following properties:
 - **name**: Unique Pantheon site name
-- **id**: Unique Pantheon id
+- **id**: Unique Pantheon site id
 - **bucket**: AWS S3 bucket for hosting visual regression tests
-- **pages**: Array of config objects for each path. Page config properties:
-  - **path**: e.g. `'/my-page'`
-  - **visualreg**: whether or not to run visual regression on this page (boolean)
-  - ... TODO
+- **multidev**: Pantheon multidev id for running upstream-updates tests
 
 
 <!-- ### Navigation Tests
@@ -82,7 +79,41 @@ View full [docs](docs/navigation_tests.md)
 
 View full [docs](docs/visual_regression.md) -->
 
-## Helpful Links
+## Running Tests Locally
+You can run your tests locally in a number of ways:
+- In a Docker container (Recommended)
+  ```bash
+  boostid test
+  ```
+- On the current machine i.e. without Docker. You can also set environment variable `BOOSTID_DEV=true` to enable non-headless, slomo mode to watch the tests as they run.
+
+  ```bash
+  ./node_modules/boostid/scripts/run-tests.sh
+  ```
+- Using CircleCI CLI (requires Circleci CLI and Docker to be installed)
+  ```bash
+  boostid ci-local
+  ```  
+
+
+## Testing with Jest and Puppeteer
+
+Any `.js` files in the `__tests__` directory of your project will be run as [Jest tests](https://jestjs.io/docs/en/getting-started).
+
+A few Puppeteer global variables are provided for convenience: `browser`, `context`, and a default `page` (See [jest-puppeteer-environment](https://www.npmjs.com/package/jest-environment-puppeteer)).
+
+Note: You can disable the default Puppeteer environment by adding the following docblock to the top of your test file:
+```js
+/**
+ * @jest-environment node
+ */
+```
+
+
+### Helpful Links
+
+**Jest Testing**
+- https://jestjs.io/docs/en/getting-started
 
 **Puppeteer API** headless Chrome testing
 - https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md
@@ -91,15 +122,3 @@ View full [docs](docs/visual_regression.md) -->
 - https://www.npmjs.com/package/jest-environment-puppeteer
 - https://www.npmjs.com/package/jest-image-snapshot
 - https://www.npmjs.com/package/expect-puppeteer
-
-## Testing with Jest
-
-Any `.js` files in the `__tests__` directory of your project will be run as [Jest tests](https://jestjs.io/docs/en/getting-started).
-
-A few Puppeteer global variables are provided for convenience: `browser`, `context`, and a default `page`.
-(Note: You can disable the default Puppeteer environment by adding the following docblock to the top of your test file)
-```js
-/**
- * @jest-environment node
- */
-```
