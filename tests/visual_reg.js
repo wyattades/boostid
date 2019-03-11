@@ -1,7 +1,9 @@
 const URL = require('url');
+const { join } = require('path');
 
 
 const TEST_RESULTS_DIR = '__boostid_results__';
+const SNAPSHOTS_DIR = join(TEST_RESULTS_DIR, 'snapshots');
 
 /**
  * @typedef ViewPortConfig
@@ -34,7 +36,7 @@ exports.visualReg = (targetUrl, devUrl, pages) => {
 
           beforeAll(async () => {
             await page.goto(URL.resolve(url, path), { waitUntil: 'networkidle0' });
-          }, 15000);
+          }, 30000);
 
           for (const viewPort of viewPorts) {
             const viewPortKey = `${viewPort.width}x${viewPort.height}${viewPort.isMobile ? 'm' : ''}`;
@@ -46,6 +48,7 @@ exports.visualReg = (targetUrl, devUrl, pages) => {
 
                 try {
                   await page.evaluate((_ignore) => {
+                    /* global document */
                     for (const sel of _ignore) {
                       document.querySelectorAll(sel).forEach((el) => {
                         el.style.visibility = 'hidden';
@@ -75,6 +78,7 @@ exports.visualReg = (targetUrl, devUrl, pages) => {
                   const image = await element.screenshot();
                   expect(image).toMatchImageSnapshot({
                     ...snapshotConfig,
+                    customSnapshotsDir: SNAPSHOTS_DIR,
                     customDiffDir: TEST_RESULTS_DIR,
                     customSnapshotIdentifier: encodeURIComponent(`${path}--${viewPortKey}--${sel}`),
                   });

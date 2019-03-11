@@ -6,21 +6,25 @@ const { navClick } = require('./utils');
 
 let loggedIn = false;
 
-exports.login = async () => {
+/**
+ * @async
+ * Login to Drupal site as admin
+ * @param {*} page Puppeteer page instance
+ * @param {string} env Pantheon environment to login as
+ */
+exports.login = async (page, env) => {
 
   config.init();
 
   await ter.login();
   await ter.assertExists();
-
-  // Need this?
-  // await ter.connectionSet('boostidup', 'sftp')
-
-  const output = await ter.remoteRun(config.get('multidev'), 'drush', 'uli');
+  
+  const output = await ter.remoteRun(env, 'drush', 'uli');
 
   const oneTimeLogin = output.trim();
   const parsed = URL.parse(oneTimeLogin);
-  expect(parsed.hostname).toBeTruthy();
+  if (!parsed.hostname)
+    throw new Error(`Failed to create one-time-login link: ${oneTimeLogin}`);
 
   await page.goto(oneTimeLogin.replace('http:', 'https:'));
   expect(URL.parse(page.url()).pathname).toBe('/user/1/edit');
@@ -28,7 +32,15 @@ exports.login = async () => {
   loggedIn = true;
 };
 
-exports.addPageNode = async ({ title, body }) => {
+/**
+ * @async
+ * Add a Drupal page node (must login first)
+ * @param {*} page Puppeteer page instance
+ * @param {Object} PageData
+ * @param {string} PageData.title
+ * @param {string} PageData.body
+ */
+exports.addPageNode = async (page, { title, body }) => {
 
   if (!loggedIn)
     throw 'Must login first';
