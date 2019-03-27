@@ -113,6 +113,15 @@ By default, save test results locally in the directory "__boostid_results__"`)
   .example('boostid ci-trigger https://github.com/wyattades/my_project#master')
   .default('branch', 'master'),
   handler: runModule('../lib/ci', 'trigger'),
+}, {
+  command: 'create-github-repo <username> <reponame>',
+  desc: 'Create a Github repository from the command line',
+  builder: (_yargs) => _yargs
+  .option('public', {
+    type: 'boolean',
+    desc: 'Make the repo public',
+  }),
+  handler: runModule('../lib/git', 'createRepo'),
 }];
 
 const program = (args) => {
