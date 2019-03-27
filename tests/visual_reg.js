@@ -27,6 +27,9 @@ const SNAPSHOTS_DIR = join(TEST_RESULTS_DIR, 'snapshots');
  */
 exports.visualReg = (targetUrl, devUrl, pages) => {
 
+  let ctx; // new browser context
+  let page; // page in new context
+
   for (const url of [targetUrl, devUrl]) {
 
     describe(`Visual regression on: ${url}`, () => {
@@ -35,7 +38,14 @@ exports.visualReg = (targetUrl, devUrl, pages) => {
         describe(`Goes to path: ${path}`, () => {
 
           beforeAll(async () => {
-            await page.goto(URL.resolve(url, path), { waitUntil: 'networkidle0' });
+            if (!ctx) {
+              ctx = await browser.createIncognitoBrowserContext();
+              page = await ctx.newPage();
+            }
+          }, 15000);
+
+          test('Load page', async () => {
+            await page.goto(URL.resolve(url, path), { waitUntil: 'networkidle2' });
           }, 30000);
 
           for (const viewPort of viewPorts) {
