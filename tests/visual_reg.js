@@ -37,12 +37,12 @@ exports.visualReg = (targetUrl, devUrl, pages) => {
       for (const { path, elements = [], ignore = [], viewPorts } of pages) {
         describe(`Goes to path: ${path}`, () => {
 
-          beforeAll(async () => {
-            if (!ctx) {
-              ctx = await browser.createIncognitoBrowserContext();
-              page = await ctx.newPage();
-            }
-          }, 15000);
+          // beforeAll(async () => {
+          //   if (!ctx) {
+          //     ctx = await browser.createIncognitoBrowserContext();
+          //     page = await ctx.newPage();
+          //   }
+          // }, 15000);
 
           test('Load page', async () => {
             await page.goto(URL.resolve(url, path), { waitUntil: 'networkidle2' });

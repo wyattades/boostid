@@ -91,8 +91,8 @@ By default, save test results locally in the directory "__boostid_results__"`)
   .usage(`boostid ter <cmd>\n\nRun terminus commands. Available commands:\n${require('../lib/terminus').help()}`),
   handler: runModule('../lib/terminus', 'run'),
 }, {
-  command: 'ci-update-meta <git>',
-  desc: 'Update CircleCI (specified by "git" url) environment variables and SSH keys',
+  command: 'ci-update-meta <git_url>',
+  desc: 'Update CircleCI (specified by the git url) environment variables and SSH keys',
   builder: (_yargs) => _yargs
   .option('slack-webhook', {
     desc: 'Slack webhook url',
@@ -107,8 +107,8 @@ By default, save test results locally in the directory "__boostid_results__"`)
   desc: 'Run CircleCI job locally using Docker',
   handler: runModule('../lib/ci', 'ciLocal'),
 }, {
-  command: 'ci-trigger <git>',
-  desc: 'Trigger CircleCI workflows for specified "git" url',
+  command: 'ci-trigger <git_url>',
+  desc: 'Trigger CircleCI workflows for specified the git url',
   builder: (_yargs) => _yargs
   .example('boostid ci-trigger https://github.com/wyattades/my_project#master')
   .default('branch', 'master'),
