@@ -1,0 +1,17 @@
+// General styling goes here
+
+html {
+  overflow-y: auto;
+}
+
+#root > :not(.is-fullheight, .navbar, .home) {
+  margin-top: $navbar-height;
+}
+
+.test-arrow-labels > span:not(:last-child) {
+  &::after {
+    content: '»';
+    font-weight: bold;
+    margin: 0 8px;
+  }
+}

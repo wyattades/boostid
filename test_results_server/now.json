@@ -1,7 +1,13 @@
 {
+  "name": "boostid",
+  "alias": "boostid",
   "version": 2,
-  "name": "boostid-results",
-  "alias": "boostid-results",
-  "builds": [{ "src": "index.js", "use": "@now/node" }],
-  "routes": [{ "src": "/(.*)", "dest": "/" }]
+  "builds": [
+    { "src": "list-buckets.js", "use": "@now/node" },
+    { "src": "**", "use": "@now/static" }
+  ],
+  "routes": [
+    { "src": "/list-buckets", "dest": "list-buckets.js" },
+    { "src": "/[^\\.]*", "dest": "index.html" }
+  ]
 }
