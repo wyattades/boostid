@@ -2,7 +2,6 @@ import React from 'react';
 import { Link, NavLink, withRouter } from 'react-router-dom';
 
 import * as api from '../api';
-// import brandingImg from '../images/vroom-car-text.svg';
 
 // To support a fixed header, add this class to document head
 // document.documentElement.classList.add('has-navbar-fixed-top');
