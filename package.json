@@ -6,7 +6,7 @@
     "docker:deploy": "docker push wades/boostid:$npm_package_version"
   },
   "dependencies": {
-    "aws-sdk": "2.403.0",
+    "aws-sdk": "2.433.0",
     "configstore": "^4.0.0",
     "fs-extra": "^7.0.1",
     "inquirer": "^6.2.2",

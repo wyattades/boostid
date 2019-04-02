@@ -1,15 +1,13 @@
 {
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server",
-    "serve": "cross-env NODE_ENV=development nodemon list-buckets",
-    "build": "cross-env NODE_ENV=production webpack",
-    "deploy": "cd dist && cp ../now.json ../list-buckets.js . && now --target production && now rm boostid -y --safe"
+    "build": "cross-env NODE_ENV=production webpack"
   },
   "license": "MIT",
   "dependencies": {
     "ansi-to-html": "^0.6.10",
+    "aws-sdk": "^2.433.0",
     "bulma": "^0.7.2",
-    "express": "^4.16.4",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-hot-loader": "^4.6.5",
