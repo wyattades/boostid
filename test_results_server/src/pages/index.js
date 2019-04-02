@@ -29,7 +29,19 @@ export default class Index extends React.Component {
   render() {
     const { awsAuth, buckets, error } = this.state;
 
-    if (error) throw error;
+    if (error) {
+      if (error.status === 403) {
+        return (
+          <div className="box">
+            <p>
+              Oops! This service account might not have permissions to list S3 buckets.
+              Please enter the name of your bucket manually in this pages url e.g. <code>/my-bucket</code>
+            </p>
+          </div>
+        );
+      }
+      throw error;
+    }
 
     return (
       <>

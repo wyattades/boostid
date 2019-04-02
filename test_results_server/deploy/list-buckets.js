@@ -17,7 +17,6 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json());
 
 app.post('*', (req, res) => {
-
   const { accessKeyId, secretAccessKey } = req.body;
 
   if (accessKeyId && secretAccessKey) {

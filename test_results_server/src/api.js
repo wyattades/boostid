@@ -139,3 +139,23 @@ export const getResults = async ({ bucket, project, test }) => {
   return { json, diffFiles };
 };
 
+const deleteDir = async (bucket, dir) => {
+
+  const listedObjects = await s3.listObjectsV2({
+    Bucket: bucket,
+    Prefix: dir,
+  }).promise();
+
+  if (listedObjects.Contents.length === 0) return;
+
+  await s3.deleteObjects({
+    Bucket: bucket,
+    Delete: { Objects: listedObjects.Contents.map(({ Key }) => ({ Key })) }
+  }).promise();
+
+  if (listedObjects.IsTruncated) await deleteDir(bucket, dir);
+};
+
+export const deleteTests = async (bucket, project, testIds) => {
+  await Promise.all(testIds.map((testId) => deleteDir(bucket, `${project}/${testId}/`)))
+};

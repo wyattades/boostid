@@ -1,7 +1,7 @@
 {
   "scripts": {
-    "serve": "cross-env NODE_ENV=development nodemon list-buckets",
-    "deploy": "cp ../dist/* . && && now --target production; rm index.* && now rm boostid -y --safe"
+    "serve": "NODE_ENV=development nodemon list-buckets",
+    "deploy": "cp ../dist/* . && now --target production; rm index.* && now rm boostid -y --safe"
   },
   "dependencies": {
     "aws-sdk": "^2.433.0",
