@@ -26,7 +26,7 @@ export default class Tests extends React.PureComponent {
 
     try {
       let tests = await api.getTests(params);
-      console.log(tests);
+
       tests = tests.map(({ id, time }) => ({
         id,
         time,
@@ -46,7 +46,7 @@ export default class Tests extends React.PureComponent {
   deleteRows = (rows) => {
     const { bucket, project } = this.props.match.params;
 
-    return api.deleteTests(bucket, project, rows.map((row) => row.id))
+    return api.deleteTests({ bucket, project }, rows.map((row) => row.id))
     .then(() => this.fetchTests())
     .catch((err) => {
       console.error(err);

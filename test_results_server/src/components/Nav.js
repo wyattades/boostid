@@ -11,7 +11,7 @@ class Nav extends React.PureComponent {
   state = {
     open: false,
     loggedIn: !!api.getAuth(),
-    mode: api.getMode(),
+    // mode: api.getMode(),
   }
 
   componentDidUpdate(props) {
@@ -26,13 +26,13 @@ class Nav extends React.PureComponent {
   .then((path) => this.props.history.push(path))
   .catch(console.error);
 
-  toggleMode = () => {
-    this.setState(({ mode }) => ({ mode: mode === 'aws' ? 'ci' : 'aws' }), () => {
-      api.setMode(this.state.mode);
-      this.props.history.push('/');
-      this.props.history.replace(this.props.location.pathname);
-    });
-  }
+  // toggleMode = () => {
+  //   this.setState(({ mode }) => ({ mode: mode === 'aws' ? 'ci' : 'aws' }), () => {
+  //     api.setMode(this.state.mode);
+  //     this.props.history.push('/');
+  //     this.props.history.replace(this.props.location.pathname);
+  //   });
+  // }
 
   render() {
     const [ bucket, project, test ] = this.props.location.pathname.slice(1).split('/');
@@ -56,9 +56,9 @@ class Nav extends React.PureComponent {
           </div>
           <div className={`navbar-menu ${open ? 'is-active' : ''}`}>
             <div className="navbar-start">
-              { bucket && bucket !== 'auth' && !ci && (
+              { bucket && bucket !== 'auth' && (
                 <NavLink className="navbar-item" exact to={`/${bucket}`}>
-                  Bucket:&nbsp;<strong>{bucket}</strong>
+                  {ci ? 'CI Projects' : <>Bucket:&nbsp;<strong>{bucket}</strong></>}
                 </NavLink>
               )}
               { project && (
@@ -73,9 +73,9 @@ class Nav extends React.PureComponent {
               )}
             </div>
             <div className="navbar-end">
-              <a className="navbar-item">
+              {/* <a className="navbar-item">
                 <button className="button is-link has-text-weight-bold is-outlined is-inverted" onClick={this.toggleMode}>{mode}</button>
-              </a>
+              </a> */}
               <NavLink className="navbar-item" exact to="/auth">
                 Authentication
               </NavLink>

@@ -145,6 +145,6 @@ const deleteDir = async (bucket, dir) => {
   if (listedObjects.IsTruncated) await deleteDir(bucket, dir);
 };
 
-export const deleteTests = async (bucket, project, testIds) => {
+export const deleteTests = async ({ bucket, project }, testIds) => {
   await Promise.all(testIds.map((testId) => deleteDir(bucket, `${project}/${testId}/`)))
 };

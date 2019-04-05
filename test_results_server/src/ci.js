@@ -3,7 +3,7 @@ import superagent from 'superagent';
 
 const DEV = process.env.NODE_ENV === 'development';
 
-const API_BASE = DEV ? 'http://localhost:3001/ci' : '/ci';
+const API_BASE = DEV ? 'http://localhost:3001/circleci' : '/circleci';
 
 export let auth = null;
 
@@ -101,7 +101,7 @@ export const getResults = async ({ bucket, project, test }) => {
     testResults: results,
   };
 
-  const image_url = artif.url.substring(0, artif.url.lastIndexOf('/') + 1);
+  const image_url = artif.url.substring(0, artif.url.lastIndexOf('/'));
 
   const diffFiles = [];
 

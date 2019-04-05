@@ -9,7 +9,7 @@
   ],
   "routes": [
     { "src": "/list-buckets", "dest": "list-buckets.js" },
-    { "src": "/ci/(.*)", "dest": "ci.js" },
+    { "src": "/circleci/(.*)", "dest": "ci.js" },
     { "src": "/[^\\.]*", "dest": "index.html" }
   ]
 }

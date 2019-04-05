@@ -28,7 +28,7 @@ NavLink.defaultProps.activeClassName = 'is-active';
 
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={(props) => api.getAuth(api.getMode()) ? <Component {...props} /> : (
+  <Route {...rest} render={(props) => api.getAuth(/^\/ci(\/|$)/.test(props.location.pathname) ? 'ci' : 'aws') ? <Component {...props} /> : (
     <Redirect to={{
       pathname: '/auth',
       search: `?error=Unauthorized&from=${encodeURIComponent(props.location.pathname)}`,

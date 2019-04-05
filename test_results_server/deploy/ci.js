@@ -1,5 +1,6 @@
 const express = require('express');
 const request = require('superagent');
+const URL = require('url');
 
 
 const API_BASE = 'https://circleci.com/api/v1.1';
@@ -22,10 +23,10 @@ if (process.env.NODE_ENV === 'development') {
   });
 }
 
-app.get('/ci/results', (req, res) => {
+app.get('/circleci/results', (req, res) => {
   const url = decodeURIComponent(req.query.url);
 
-  if (!url || !url.startsWith('https://'))
+  if (!url || !URL.parse(url).hostname)
     res.status(400).json({});
   else
     request.get(url)
@@ -40,8 +41,8 @@ app.get('/ci/results', (req, res) => {
     });
 });
 
-app.all('/ci/*', (req, res, next) => {
-  const url = `${API_BASE}${req.originalUrl.substring(3)}`;
+app.all('/circleci/*', (req, res, next) => {
+  const url = `${API_BASE}${req.originalUrl.substring(9)}`;
 
   res.set('Content-Type', 'application/json');
 

@@ -12,15 +12,15 @@ const api = {
 //   ci: null,
 // };
 
-let mode = window.localStorage.getItem('boostid_ci_mode') ? 'ci' : 'aws';
+// let mode = window.localStorage.getItem('boostid_ci_mode') ? 'ci' : 'aws';
 
-export const setMode = (_mode) => {
-  mode = _mode;
-  window.localStorage.setItem('boostid_ci_mode', mode === 'ci' ? '1' : '')
-  // mode = mode === 'aws' ? 'ci' : 'aws';
-};
+// export const setMode = (_mode) => {
+//   mode = _mode;
+//   window.localStorage.setItem('boostid_ci_mode', mode === 'ci' ? '1' : '')
+//   // mode = mode === 'aws' ? 'ci' : 'aws';
+// };
 
-export const getMode = () => mode;
+// export const getMode = () => mode;
 
 export const init = () => {
   for (const type in api) {
@@ -50,7 +50,7 @@ export const getAuth = (type = 'aws') => api[type].auth;
 
 export const getBuckets = (type = 'aws') => api[type].getBuckets();
 
-export const getProjects = (params, type = 'aws') => api[mode].getProjects(params);
-export const getTests = (params, type = 'aws') => api[mode].getTests(params);
-export const getResults = (params, type = 'aws') => api[mode].getResults(params);
-export const deleteTests = (tests, type = 'aws') => api[mode].deleteTests(tests);
+export const getProjects = (params) => api[params.bucket === 'ci' ? 'ci' : 'aws'].getProjects(params);
+export const getTests = (params) => api[params.bucket === 'ci' ? 'ci' : 'aws'].getTests(params);
+export const getResults = (params) => api[params.bucket === 'ci' ? 'ci' : 'aws'].getResults(params);
+export const deleteTests = (params, tests) => api[params.bucket === 'ci' ? 'ci' : 'aws'].deleteTests(params, tests);
