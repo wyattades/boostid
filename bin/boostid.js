@@ -46,6 +46,10 @@ By default, save test results locally in the directory "__boostid_results__"`)
     desc: 'Don\'t save test results locally',
     type: 'boolean',
   })
+  .option('no-docker', {
+    desc: 'Don\'t run tests using Docker',
+    type: 'boolean',
+  })
   .option('dev-boostid', {
     desc: 'FOR DEVELOPMENT ONLY: Path to a local "boostid" repository',
     type: 'string',
