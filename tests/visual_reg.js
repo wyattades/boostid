@@ -45,7 +45,10 @@ exports.visualReg = (targetUrl, devUrl, pages) => {
           // }, 15000);
 
           test('Load page', async () => {
-            await page.goto(URL.resolve(url, path), { waitUntil: 'networkidle2' });
+            await page.goto(URL.resolve(url, path), {
+              waitUntil: ['load', 'domcontentloaded', 'networkidle2'],
+              timeout: 0,
+            });
           }, 30000);
 
           for (const viewPort of viewPorts) {
