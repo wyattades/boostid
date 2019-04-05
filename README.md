@@ -9,7 +9,7 @@
     ```bash
     npm install -g wyattades/boostid
     ```
-- Make sure you have [_Docker_](https://docs.docker.com/install/#supported-platforms) v18 and up
+- It's helpful to have [_Docker_](https://docs.docker.com/install/#supported-platforms) v18 and up
     ```bash
     docker -v
     ```
@@ -40,17 +40,22 @@ Command suite for Rootid development and testing
 Usage: boostid <command> [options]
 
 Commands:
-  boostid help [command]               Output usage information
-  boostid setup                        Setup a Pantheon site for development with Boostid
-  boostid check-local                  Test if local environment is ready for development
-  boostid test                         Run coverage tests locally in a Docker container
-  boostid config                       Read and write global config
-  boostid upstream-updates <multidev>  Create multidev as copy of "dev" and apply upstream updates
-  boostid ter <cmd> [args...]          Run terminus commands for current site
-  boostid ci-update-meta <git>         Update CircleCI (specified by "git" url) environment
-                                       variables and SSH keys
-  boostid ci-local <job>               Run CircleCI job locally using Docker
-  boostid ci-trigger <git>             Trigger CircleCI workflows for specified "git" url
+  boostid help [command]                            Output usage information
+  boostid setup                                     Setup a Pantheon site for development with
+                                                    Boostid
+  boostid check-local                               Test if local environment is ready for
+                                                    development
+  boostid test                                      Run coverage tests locally in a Docker container
+  boostid config                                    Read and write global config
+  boostid upstream-updates <multidev>               Create multidev as copy of "dev" and apply
+                                                    upstream updates
+  boostid ter <cmd> [args...]                       Run terminus commands
+  boostid ci-update-meta <git_url>                  Update CircleCI (specified by the git url)
+                                                    environment variables and SSH keys
+  boostid ci-local <job>                            Run CircleCI job locally using Docker
+  boostid ci-trigger <git_url>                      Trigger CircleCI workflows for specified the git
+                                                    url
+  boostid create-github-repo <username> <reponame>  Create a Github repository from the command line
 
 Options:
   --help, -h           Show help                                                           [boolean]
@@ -67,8 +72,8 @@ There should be a file __boostid.config.js__ in your project root.
 It should export an object with the following properties:
 - **name**: Unique Pantheon site name
 - **id**: Unique Pantheon site id
-- **bucket**: AWS S3 bucket for hosting visual regression tests
 - **multidev**: Pantheon multidev id for running upstream-updates tests
+- **bucket**: AWS S3 bucket for hosting visual regression tests (optional)
 
 
 <!-- ### Navigation Tests
@@ -85,12 +90,11 @@ You can run your tests locally in a number of ways:
   ```bash
   boostid test
   ```
-- On the current machine i.e. without Docker. You can also set environment variable `BOOSTID_DEV=true` to enable non-headless, slomo mode to watch the tests as they run.
-
+- On the current machine i.e. without Docker. You can also set environment variable `BOOSTID_DEV=true` to enable non-headless mode, so you can watch the tests as they run.
   ```bash
-  ./node_modules/boostid/scripts/run-tests.sh
+  boostid test --no-docker
   ```
-- Using CircleCI CLI (requires Circleci CLI and Docker to be installed)
+- Using CircleCI CLI (requires the official CircleCI CLI and Docker to be installed)
   ```bash
   boostid ci-local
   ```  
