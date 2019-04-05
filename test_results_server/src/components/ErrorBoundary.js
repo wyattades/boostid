@@ -38,9 +38,12 @@ class ErrorBoundary extends React.Component {
         code;
     
     if (typeof error === 'string') message = error;
-    else {
-      if (error && error.code) code = error.code;
-      else if (error && error.status) code = error.status;
+    else if (error) {
+      if (error.code) {
+        code = error.code;
+        if (error.message) message = error.message;
+      }
+      else if (error.status) code = error.status;
     }
 
     this.setError(code, message);

@@ -12,7 +12,7 @@ export default class Projects extends React.PureComponent {
   }
 
   async componentDidMount() {
-    const { history, match: { params }, location } = this.props;
+    const params = this.props.match.params;
 
     try {
       const projects = await api.getProjects(params);
@@ -42,7 +42,7 @@ export default class Projects extends React.PureComponent {
           <h1 className="is-size-4">Projects</h1>
           <br/>
           {projects.map((p) => (
-            <p key={p}><Link to={`/${bucket}/${p}`}>{p}</Link></p>
+            <p key={p.id}><Link to={`/${bucket}/${p.id}`}>{p.label}</Link></p>
           ))}
         </div>
       </>

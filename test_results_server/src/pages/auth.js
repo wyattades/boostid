@@ -23,6 +23,7 @@ export default class Auth extends React.Component {
 
     this.state = {
       awsAuth: api.getAuth(),
+      ciAuth: api.getAuth('ci'),
       error: null,
       from: '/',
     };
@@ -44,7 +45,7 @@ export default class Auth extends React.Component {
   awsLogin = (e) => {
     const [ accessKeyId, secretAccessKey ] = parseSubmit(e);
 
-    api.login(accessKeyId, secretAccessKey);
+    api.login({ accessKeyId, secretAccessKey });
 
     this.setState({ awsAuth: api.getAuth() });
   }
@@ -58,11 +59,19 @@ export default class Auth extends React.Component {
   ciLogin = (e) => {
     const [ token ] = parseSubmit(e);
 
-    console.log(token);
+    api.login({ token }, 'ci');
+
+    this.setState({ ciAuth: api.getAuth('ci') });
+  }
+
+  ciLogout = () => {
+    api.logout('ci');
+
+    this.setState({ ciAuth: null });
   }
   
   render() {
-    const { awsAuth, error } = this.state;
+    const { awsAuth, ciAuth, error } = this.state;
 
     return (
       <>
@@ -108,20 +117,33 @@ export default class Auth extends React.Component {
                 <input type="password" className="input" required/>
               </div>
               <div className="field">
-                <button type="submit" className="button">Login</button>
+                <button type="submit" className="button is-success">Save</button>
               </div>
             </>
           )}
         </form>
 
-        <form onSubmit={this.ciLogin} className="box">
+        <form onSubmit={this.ciLogin} className="box" style={{ position: 'relative' }}>
           <h2 className="is-size-4">CircleCI User Token</h2>
-          <p className="has-text-grey">You can find yours by running <code>boostid config get</code> in your terminal</p>
-          <br/>
-          <div className="field">
-            <label className="label">Token</label>
-            <input type="text" className="input" required/>
-          </div>
+          { ciAuth ? (
+            <>
+              <p className="has-text-grey">Saved credentials with CI Token: {ciAuth.token}</p>
+              <button type="button" className="button is-danger is-outlined" style={{ position: 'absolute', top: 20, right: 20 }}
+                onClick={this.ciLogout}>Clear Credentials</button>
+            </>
+          ) : (
+            <>
+              <p className="has-text-grey">You can find yours by running <code>boostid config get</code> in your terminal</p>
+              <br/>
+              <div className="field">
+                <label className="label">Token</label>
+                <input type="text" className="input" required/>
+              </div>
+              <div className="field">
+                <button type="submit" className="button is-success">Save</button>
+              </div>
+            </>
+          )}
         </form>
       </>
     );

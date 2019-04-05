@@ -2,12 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 
-const allEqual = (array, val) => {
-  for (const el of array)
-    if (el !== val) return false;
-  return true;
-};
-
 export default class ActionTable extends React.PureComponent {
 
   static defaultProps = {
@@ -16,15 +10,24 @@ export default class ActionTable extends React.PureComponent {
 
   state = {
     checked: [],
+    amountChecked: 0,
     actioning: false,
   }
 
   static getDerivedStateFromProps(props, state) {
     if (props.data.length !== state.checked.length)
       return {
-        checked: props.data.map(() => false)
+        checked: props.data.map(() => false),
       };
     return null;
+  }
+
+  componentDidMount() {
+    document.addEventListener('mouseup', this.onMouseUp);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mouseup', this.onMouseUp);
   }
 
   renderRow = (row, i) => {
@@ -33,8 +36,8 @@ export default class ActionTable extends React.PureComponent {
 
     return (
       <tr key={i}>
-        <td onMouseEnter={this.onOver(i)}>
-          <input type="checkbox" checked={checked[i]} onChange={this.toggleCheck(i)}/>
+        <td onMouseDown={this.onMouseDown(i)} onMouseEnter={this.onOver(i)} className="no-select">
+          <input type="checkbox" checked={checked[i]} onChange={this.onCheck(i)}/>
         </td>
         {columns.map((column, i) => (
           <td key={column}>{(i === 0 && row._link) ? (<Link to={row._link}>{row[column]}</Link>) : row[column]}</td>
@@ -43,14 +46,38 @@ export default class ActionTable extends React.PureComponent {
     );
   }
 
-  toggleCheck = (index) => () => {
-    this.setState({ checked: this.state.checked.map((check, i) => index === i ? !check : check) });
+  toggleCheck(index, force) {
+    this.setState(({ checked }) => {
+      
+      let amountChecked = 0;
+
+      checked = checked.map((check, i) => {
+        const newCheck = index === i ? (typeof force === 'boolean' ? force : !check) : check;
+        if (newCheck === true) amountChecked++;
+        return newCheck;
+      })
+
+      return {
+        checked,
+        amountChecked,
+      };
+    });
+  }
+
+  onCheck = (index) => () => {
+    if (this.dragging !== null)
+      this.toggleCheck(index);    
   }
 
   toggleCheckAll = () => {
-    const val = !allEqual(this.state.checked, true);
-
-    this.setState({ checked: this.state.checked.map(() => val)  });
+    this.setState(({ amountChecked, checked }) => {
+      // const newChecked = !allEqual(this.state.checked, true);
+      const newChecked = amountChecked !== checked.length;
+      return {
+        checked: this.state.checked.map(() => newChecked),
+        amountChecked: newChecked ? checked.length : 0,
+      };
+    });
   }
 
   handleAction = (action) => () => {
@@ -65,31 +92,37 @@ export default class ActionTable extends React.PureComponent {
     })
   }
 
-  dragging = false;
+  dragging = null;
 
-  onMouseDown = () => {
-    this.dragging = true;
+  onMouseDown = (index) => () => {
+
+    this.dragging = index;
+    this.dragSet = !this.state.checked[index];
+
+    this.toggleCheck(index);
   }
 
   onMouseUp = () => {
-    this.dragging = false;
+    this.dragging = null;
   }
 
   onOver = (index) => () => {
-    if (this.dragging) {
-      this.setState({ checked: this.state.checked.map((check, i) => index === i ? true : check) });
+    if (this.dragging !== null) {
+      this.toggleCheck(index, this.dragSet);
+      // this.setState({ checked: this.state.checked.map((check, i) => index === i ? true : check) });
     }
   }
 
   render() {
     const { data, columns, actions } = this.props;
-    const { checked, actioning } = this.state;
+    const { checked, amountChecked, actioning } = this.state;
 
     if (actioning) return (
       <div>Waiting...</div>
     );
 
-    const allFalse = allEqual(checked, false);
+    const allFalse = amountChecked === 0;
+    const allTrue = amountChecked === checked.length;
 
     return (
       <>
@@ -104,11 +137,11 @@ export default class ActionTable extends React.PureComponent {
           </div>
         ) : null}
 
-        <table className="table" onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp}>
+        <table className="table">
           <thead>
             <tr>
               <th>
-                <input type="checkbox" checked={allEqual(checked, true)} onChange={this.toggleCheckAll}/>
+                <input type="checkbox" checked={allTrue} onChange={this.toggleCheckAll}/>
               </th>
               {columns.map((column) => (
                 <th className="is-capitalized" key={column}>{column}</th>

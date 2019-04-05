@@ -4,10 +4,12 @@
   "version": 2,
   "builds": [
     { "src": "list-buckets.js", "use": "@now/node" },
+    { "src": "ci.js", "use": "@now/node" },
     { "src": "**", "use": "@now/static" }
   ],
   "routes": [
     { "src": "/list-buckets", "dest": "list-buckets.js" },
+    { "src": "/ci/(.*)", "dest": "ci.js" },
     { "src": "/[^\\.]*", "dest": "index.html" }
   ]
 }

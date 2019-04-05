@@ -11,6 +11,7 @@ class Nav extends React.PureComponent {
   state = {
     open: false,
     loggedIn: !!api.getAuth(),
+    mode: api.getMode(),
   }
 
   componentDidUpdate(props) {
@@ -25,53 +26,19 @@ class Nav extends React.PureComponent {
   .then((path) => this.props.history.push(path))
   .catch(console.error);
 
+  toggleMode = () => {
+    this.setState(({ mode }) => ({ mode: mode === 'aws' ? 'ci' : 'aws' }), () => {
+      api.setMode(this.state.mode);
+      this.props.history.push('/');
+      this.props.history.replace(this.props.location.pathname);
+    });
+  }
+
   render() {
     const [ bucket, project, test ] = this.props.location.pathname.slice(1).split('/');
-    const { open, loggedIn } = this.state;
-    const front = this.props.location.pathname === '/';
+    const { open, mode } = this.state;
 
-    // let NavBarEnd = null;
-    // if (!loggedIn) {
-    //   NavBarEnd = (
-    //     <div className="navbar-item">
-    //       <button className="button is-outlined is-link is-inverted" onClick={this.signIn}>
-    //         Sign In
-    //       </button>
-    //     </div>
-    //   );
-    // } else {
-    //   NavBarEnd = (
-    //     <>
-    //       <NavLink className="navbar-item" to="/dashboard">
-    //         Dashboard
-    //       </NavLink>
-    //       <NavLink className="navbar-item" exact to="/listings">
-    //         Listings
-    //       </NavLink>
-    //       <NavLink className="navbar-item" exact to="/listings/new">
-    //         Create Listing
-    //       </NavLink>
-    //       <div className="navbar-item has-dropdown is-hoverable">
-    //         <NavLink className="navbar-link" to="/account">
-    //           {'Name!'}
-    //         </NavLink>
-    //         <div className="navbar-dropdown is-right is-boxed">
-    //           <Link className="navbar-item" to="/mylistings">
-    //             My Listings
-    //           </Link>
-    //           <hr className="navbar-divider" />
-    //           <Link className="navbar-item" to="/account">
-    //             Account
-    //           </Link>
-    //           <hr className="navbar-divider" />
-    //           <Link className="navbar-item" to="/logout">
-    //             Logout
-    //           </Link>
-    //         </div>
-    //       </div>
-    //     </>
-    //   );
-    // }
+    const ci = bucket === 'ci';
 
     return (
       <nav className={`navbar is-fixed-top is-primary`}>
@@ -89,14 +56,14 @@ class Nav extends React.PureComponent {
           </div>
           <div className={`navbar-menu ${open ? 'is-active' : ''}`}>
             <div className="navbar-start">
-              { bucket && bucket !== 'auth' && (
+              { bucket && bucket !== 'auth' && !ci && (
                 <NavLink className="navbar-item" exact to={`/${bucket}`}>
                   Bucket:&nbsp;<strong>{bucket}</strong>
                 </NavLink>
               )}
               { project && (
                 <NavLink className="navbar-item" exact to={`/${bucket}/${project}`}>
-                  Project:&nbsp;<strong>{project}</strong>
+                  Project:&nbsp;<strong>{ci ? decodeURIComponent(project) : project}</strong>
                 </NavLink>
               )}
               { test && (
@@ -106,6 +73,9 @@ class Nav extends React.PureComponent {
               )}
             </div>
             <div className="navbar-end">
+              <a className="navbar-item">
+                <button className="button is-link has-text-weight-bold is-outlined is-inverted" onClick={this.toggleMode}>{mode}</button>
+              </a>
               <NavLink className="navbar-item" exact to="/auth">
                 Authentication
               </NavLink>

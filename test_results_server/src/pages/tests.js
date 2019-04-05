@@ -26,10 +26,10 @@ export default class Tests extends React.PureComponent {
 
     try {
       let tests = await api.getTests(params);
-
+      console.log(tests);
       tests = tests.map(({ id, time }) => ({
         id,
-        time: new Date(time).toLocaleString(),
+        time,
         _link: `/${bucket}/${project}/${id}`,
       }));
 

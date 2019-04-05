@@ -28,7 +28,7 @@ NavLink.defaultProps.activeClassName = 'is-active';
 
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={(props) => api.getAuth() ? <Component {...props} /> : (
+  <Route {...rest} render={(props) => api.getAuth(api.getMode()) ? <Component {...props} /> : (
     <Redirect to={{
       pathname: '/auth',
       search: `?error=Unauthorized&from=${encodeURIComponent(props.location.pathname)}`,
@@ -42,6 +42,7 @@ const App = () => (
     {/* <RouterToUrlQuery> */}
     <>
       <Nav/>
+
       <section className="section">
         <ErrorBoundary>
           <Switch>

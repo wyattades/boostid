@@ -20,7 +20,7 @@ export default class Results extends React.PureComponent {
   }
 
   async componentDidMount() {
-    const { history, match: { params }, location } = this.props;
+    const params = this.props.match.params;
 
     try {
       const { json, diffFiles } = await api.getResults(params);
@@ -43,7 +43,7 @@ export default class Results extends React.PureComponent {
 
     if (!json) return <p>Loading...</p>;
 
-    const { project, bucket, test } = this.props.match.params;
+    // const { project, bucket, test } = this.props.match.params;
     const { timestamp, ciUrl, ciJob, testResults } = json;
 
     return (
@@ -68,7 +68,9 @@ export default class Results extends React.PureComponent {
         <br/>
         {diffFiles.map(({ filename, label }, i) => (
           <div key={i}>
-            <p style={{ marginBottom: 8 }}><strong>Test:</strong> <span className="test-arrow-labels">{label.map((l) => <span>{l}</span>)}</span></p>
+            <p style={{ marginBottom: 8 }}>
+              <strong>Test:</strong> <span className="test-arrow-labels">{label.map((l) => <span>{l}</span>)}</span>
+            </p>
             <a href={filename} target="_blank">
               <img className="diff-image" src={filename}/>
             </a>
