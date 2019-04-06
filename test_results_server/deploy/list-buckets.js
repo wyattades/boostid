@@ -3,20 +3,11 @@ const S3 = require('aws-sdk/clients/s3');
 const express = require('express');
 
 
-const app = express();
+const app = express.Router();
 module.exports = app;
 
-if (process.env.NODE_ENV === 'development') {
-  app.use((req, res, next) => {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Headers', '*');
-    next();
-  });
-}
 
-app.use(express.json());
-
-app.post('*', (req, res) => {
+app.post('/', (req, res) => {
   const { accessKeyId, secretAccessKey } = req.body;
 
   if (accessKeyId && secretAccessKey) {
@@ -40,10 +31,3 @@ app.post('*', (req, res) => {
     res.status(400).json({});
   }
 });
-
-
-if (process.env.NODE_ENV === 'development') {
-  app.listen(3000, () => {
-    console.log('> Listening on https://locahost:3000');
-  });
-}

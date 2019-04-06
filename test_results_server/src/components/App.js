@@ -46,7 +46,7 @@ const App = () => (
       <section className="section">
         <ErrorBoundary>
           <Switch>
-            <PrivateRoute exact path="/" component={Index} />
+            <Route exact path="/" component={Index} />
             <Route exact path="/auth" component={Auth}/>
             <PrivateRoute exact path="/:bucket" component={Projects}/>
             <PrivateRoute exact path="/:bucket/:project" component={Tests}/>

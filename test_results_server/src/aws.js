@@ -32,8 +32,9 @@ export const login = async (_auth) => {
 
 export const getBuckets = async () => {
 
-  const { body } = await request.post(DEV ? 'http://localhost:3000' : '/list-buckets')
-  .type('json').accept('json')
+  const { body } = await request.post(DEV ? 'http://localhost:3000/api/list-buckets' : '/api/list-buckets')
+  .type('json')
+  .accept('json')
   .send(auth);
 
   // const body = await window.fetch(DEV ? 'http://localhost:3000' : '/list-buckets', {

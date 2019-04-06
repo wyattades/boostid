@@ -55,8 +55,8 @@ export default class Results extends React.PureComponent {
         <hr/>
         <h2 className="is-size-4">Test File Results:</h2>
         <br/>
-        {testResults.testResults.map(({ name, message }, i) => (
-          <div key={i}>
+        {testResults.testResults.map(({ name, message }) => (
+          <div key={name}>
             <p style={{ marginBottom: 8 }} className={message ? 'has-text-danger' : 'has-text-success'}>{name}</p>
             {message ? <pre dangerouslySetInnerHTML={{ __html: ansiToHtml.toHtml(message) }}/> : null}
             <br/>
@@ -66,10 +66,10 @@ export default class Results extends React.PureComponent {
         <h2 className="is-size-4">Visual Regression Mismatches:</h2>
         <p>{diffFiles.length} Mismatches</p>
         <br/>
-        {diffFiles.map(({ filename, label }, i) => (
-          <div key={i}>
+        {diffFiles.map(({ filename, label }) => (
+          <div key={filename}>
             <p style={{ marginBottom: 8 }}>
-              <strong>Test:</strong> <span className="test-arrow-labels">{label.map((l) => <span>{l}</span>)}</span>
+              <strong>Test:</strong> <span className="test-arrow-labels">{label.map((l) => <span key={l}>{l}</span>)}</span>
             </p>
             <a href={filename} target="_blank">
               <img className="diff-image" src={filename}/>

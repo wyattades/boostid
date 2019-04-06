@@ -3,13 +3,11 @@
   "alias": "boostid",
   "version": 2,
   "builds": [
-    { "src": "list-buckets.js", "use": "@now/node" },
-    { "src": "ci.js", "use": "@now/node" },
-    { "src": "**", "use": "@now/static" }
+    { "src": "api.js", "use": "@now/node-server" },
+    { "src": "index.*", "use": "@now/static" }
   ],
   "routes": [
-    { "src": "/list-buckets", "dest": "list-buckets.js" },
-    { "src": "/circleci/(.*)", "dest": "ci.js" },
+    { "src": "/api/(.*)", "dest": "api.js" },
     { "src": "/[^\\.]*", "dest": "index.html" }
   ]
 }

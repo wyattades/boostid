@@ -3,7 +3,9 @@ import superagent from 'superagent';
 
 const DEV = process.env.NODE_ENV === 'development';
 
-const API_BASE = DEV ? 'http://localhost:3001/circleci' : '/circleci';
+const API_BASE = DEV
+  ? 'http://localhost:3000/api/ci'
+  : '/api/ci';
 
 export let auth = null;
 
@@ -60,11 +62,30 @@ export const getProjects = async ({ bucket }) => {
   const projects = await request('/projects');
   return projects.map((p) => {
     const label = `${p.vcs_type}/${p.username}/${p.reponame}`;
+
+    let status;
+    let time;
+
+    const { last_success, last_non_success } = p.branches.master;
+    const s_time = last_success ? new Date(last_success.added_at).getTime() : 0;
+    const ns_time = last_non_success ? new Date(last_non_success.added_at).getTime() : 0;
+
+    if (!s_time && !ns_time);
+    else if ((!s_time && ns_time) || (s_time && ns_time && ns_time > s_time)) {
+      status = 'failing';
+      time = ns_time;
+    } else if ((!ns_time && s_time) || (s_time && ns_time && s_time > ns_time)) {
+      status = 'passing';
+      time = s_time;
+    }
+
     return {
-      label,
+      label: `${p.vcs_type}/${p.username} - ${p.reponame}`,
+      status,
+      time,
       id: encodeURIComponent(label),
     }
-  });
+  }).sort((a, b) => b.time - a.time);
 };
 
 export const getTests = async ({ bucket, project }) => {
@@ -96,8 +117,8 @@ export const getResults = async ({ bucket, project, test }) => {
     throw { code: 400, message: 'Invalid test results JSON file' };
 
   const json = {
-    ciJob: 0,
-    ciUrl: '',
+    ciJob: test,
+    ciUrl: `https://circleci.com/${vcs_type === 'github' ? 'gh' : 'bb'}/${username}/${reponame}`,
     testResults: results,
   };
 
@@ -115,7 +136,7 @@ export const getResults = async ({ bucket, project, test }) => {
         if (match) {
           diffFiles.push({
             label: assertResult.ancestorTitles.slice(1).concat([ assertResult.title ]),
-            filename: `${image_url}/${encodeURIComponent(match[1])}`,
+            filename: `${image_url}/${encodeURIComponent(match[1])}?circle-token=${auth.token}`,
           });
         }
       }

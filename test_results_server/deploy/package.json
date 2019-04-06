@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "serve": "NODE_ENV=development nodemon list-buckets",
+    "serve": "NODE_ENV=development nodemon api",
     "deploy": "cp ../dist/* . && now --target production; rm index.* && now rm boostid -y --safe"
   },
   "dependencies": {

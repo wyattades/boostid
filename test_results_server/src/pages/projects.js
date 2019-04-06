@@ -41,9 +41,34 @@ export default class Projects extends React.PureComponent {
         <div className="box">        
           <h1 className="is-size-4">Projects</h1>
           <br/>
-          {projects.map((p) => (
-            <p key={p.id}><Link to={`/${bucket}/${p.id}`}>{p.label}</Link></p>
-          ))}
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Last Test<br/>Status</th>
+                <th>Last Test<br/>Time</th>
+                <th>Project</th>
+              </tr>
+            </thead>
+            <tbody>
+              {projects.map((p) => (
+                <tr key={p.id}>
+                  <td>
+                    {p.status && (
+                      p.status === 'passing'
+                        ? <span class="tag is-success">Passing</span>
+                        : <span class="tag is-danger">Failing</span>
+                    )}
+                  </td>
+                  <td>
+                    {new Date(p.time).toLocaleString()}
+                  </td>
+                  <td>
+                    <Link to={`/${bucket}/${p.id}`}>{p.label}</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </>
     );
