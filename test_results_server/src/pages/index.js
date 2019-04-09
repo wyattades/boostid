@@ -7,20 +7,20 @@ import * as api from '../api';
 export default class Index extends React.Component {
 
   state = {
-    awsAuth: api.getAuth(),
-    ciAuth: api.getAuth('ci'),
-    buckets: null,
+    // awsAuth: api.getAuth(),
+    ciAuth: api.getAuth(),
+    // buckets: null,
     ci: null,
-    awsError: null,
+    // awsError: null,
     ciError: null,
   }
 
   async componentDidMount() {
-    if (this.state.awsAuth) {
-      api.getBuckets('aws')
-      .then((buckets) => this.setState({ buckets }))
-      .catch((awsError) => this.setState({ awsError }));
-    }
+    // if (this.state.awsAuth) {
+    //   api.getBuckets('aws')
+    //   .then((buckets) => this.setState({ buckets }))
+    //   .catch((awsError) => this.setState({ awsError }));
+    // }
     if (this.state.ciAuth) {
       api.getBuckets('ci')
       .then((ci) => this.setState({ ci }))
@@ -31,20 +31,21 @@ export default class Index extends React.Component {
   render() {
     const { awsAuth, ciAuth, ci, buckets, awsError, ciError } = this.state;
 
-    if (awsError && awsError !== 403) throw awsError;
+    // if (awsError && awsError !== 403) throw awsError;
     if (ciError) throw ciError;
 
     return (
       <>
 
         <p>
-          There are two ways to view test results: on an AWS S3 bucket or with CircleCI Artifacts.<br/>
-          The button at the top right toggles between these two options.
+          Welcome to Boostid Test Results. Here you can easily view the status of CircleCI builds for your websites.
+          Unlike CircleCI, this site lets you view visual regression result images and other coverage tests results all
+          in one place. 
         </p>
         <hr/>
         <br/>
 
-        { awsAuth && (
+        {/* { awsAuth && (
           <div className="box">
             <h2 className="is-size-4">AWS Buckets</h2>
             <br/>
@@ -61,9 +62,9 @@ export default class Index extends React.Component {
               )
             )}
           </div>
-        )}
+        )} */}
 
-        { ciAuth && (
+        { ciAuth ? (
           <div className="box">
             <h2 className="is-size-4">CircleCI Account</h2>
             <br/>
@@ -73,12 +74,14 @@ export default class Index extends React.Component {
                 <p><strong>Username:</strong> {ci.login || '---'}</p>
                 <p><strong>Email:</strong> {ci.email}</p>
                 <br/>
-                <p>View your CircleCI projects here: <Link to="/ci">boostid.now.sh/ci</Link></p>
+                <p><Link to="/ci">View your CircleCI projects</Link></p>
               </>
             ) : (
               <p>Loading...</p>
             )}
           </div>
+        ) : (
+          <p>You are not authenticated. Please <Link to="/auth">authenticate with CircleCI</Link></p>
         )}
       </>
     );

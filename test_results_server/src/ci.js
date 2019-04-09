@@ -88,7 +88,7 @@ export const getProjects = async ({ bucket }) => {
   }).sort((a, b) => b.time - a.time);
 };
 
-export const getTests = async ({ bucket, project }) => {
+export const getTests = async ({ project }) => {
   const { username, vcs_type, reponame } = parseProject(project);
 
   const tests = await request(`/project/${vcs_type}/${username}/${reponame}`);
@@ -96,54 +96,69 @@ export const getTests = async ({ bucket, project }) => {
   return tests.map((t) => ({
     id: t.build_num,
     time: new Date(t.queued_at).toLocaleString(),
+    status: t.status,
   }));
 };
 
-export const getResults = async ({ bucket, project, test }) => {
+export const getResults = async ({ project, test }) => {
   const { username, vcs_type, reponame } = parseProject(project);
 
   const artifacts = await request(`/project/${vcs_type}/${username}/${reponame}/${test}/artifacts`);
 
   const artif = artifacts.find((a) => a.path === 'boostid_results/results.json');
-  // console.log(artifacts);
-  if (!artif)
-    throw { code: 400, message: 'Could not find test results JSON file in CircleCI artifacts' };
 
-  const results = await request(`/results?url=${encodeURIComponent(artif.url + `?circle-token=${auth.token}`)}`);//await superagent.get(artif.url).accept('json').unset();
 
-  // const { body: jsonStr } = await superagent.get(`/project/${vcs_type}/${username}/${reponame}/${test}/artifacts/0/boostid_results/results.json?circle-token=${auth.token}`);
-
-  if (!results || typeof results !== 'object')
-    throw { code: 400, message: 'Invalid test results JSON file' };
-
-  const json = {
+  const results = {
+    timestamp: null,
     ciJob: test,
-    ciUrl: `https://circleci.com/${vcs_type === 'github' ? 'gh' : 'bb'}/${username}/${reponame}`,
-    testResults: results,
+    ciUrl: `https://circleci.com/${vcs_type === 'github' ? 'gh' : 'bb'}/${username}/${reponame}/${test}`,
+    ciStatus: '?',
+    testResults: null,
+    diffFiles: [],
   };
 
-  const image_url = artif.url.substring(0, artif.url.lastIndexOf('/'));
+  // console.log(artifacts);
+  if (artif) {
+    // throw { code: 400, message: 'Could not find test results JSON file in CircleCI artifacts' };
 
-  const diffFiles = [];
+    const json = await request(`/results?url=${encodeURIComponent(artif.url + `?circle-token=${auth.token}`)}`);
+
+    if (!json || typeof json !== 'object')
+      throw { code: 400, message: 'Invalid test results JSON file' };
+    console.log(json);
+    results.testResults = json.testResults;
+    results.ciStatus = json.success ? 'success' : 'failure';
+  } else {
+    const ciResults = await request(`/project/${vcs_type}/${username}/${reponame}/${test}`);
+
+    results.ciStatus = ciResults.status;
+    results.timestamp = ciResults.timestamp;
+    console.log(ciResults);
+  }
 
   // for each file
-  for (const { assertionResults } of json.testResults.testResults) {
+  if (artif && Array.isArray(results.testResults)) {
 
-    // for each test in that file
-    for (const assertResult of assertionResults) {
-      if (assertResult.failureMessages && assertResult.failureMessages.length) {
-        const match = assertResult.failureMessages[0].match(/([^\s/]+?-diff\.png)/);
-        if (match) {
-          diffFiles.push({
-            label: assertResult.ancestorTitles.slice(1).concat([ assertResult.title ]),
-            filename: `${image_url}/${encodeURIComponent(match[1])}?circle-token=${auth.token}`,
-          });
+    const image_url = artif.url.substring(0, artif.url.lastIndexOf('/'));
+
+    for (const { assertionResults } of results.testResults) {
+
+      // for each test in that file
+      for (const assertResult of assertionResults) {
+        if (assertResult.failureMessages && assertResult.failureMessages.length) {
+          const match = assertResult.failureMessages[0].match(/([^\s/]+?-diff\.png)/);
+          if (match) {
+            results.diffFiles.push({
+              label: assertResult.ancestorTitles.slice(1).concat([ assertResult.title ]),
+              filename: `${image_url}/${encodeURIComponent(match[1])}?circle-token=${auth.token}`,
+            });
+          }
         }
       }
     }
   }
 
-  return { json, diffFiles };
+  return results;
 };
 
 export const deleteTests = async () => {

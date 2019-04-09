@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use('/api/ci', require('./ci'));
-app.use('/api/list-buckets', require('./list-buckets'));
+// app.use('/api/list-buckets', require('./list-buckets'));
 
 app.use((err, req, res, next) => {
   res.status(500).json({

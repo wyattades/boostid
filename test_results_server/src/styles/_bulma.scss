@@ -1,3 +1,5 @@
+@import '~bulma/sass/utilities/initial-variables.sass';
+
 
 // Set your brand colors
 // $purple: #692a2a;
@@ -9,7 +11,7 @@
 // $black: #16171a;
 
 $danger: hsl(8%, 49%, 51%);
-$primary: hsl(87%, 29%, 69%);
+$primary: #8cc63f;
 // $link: hsl(97%, 36%, 83%);
 $link-invert: rgb(62, 94, 84);
 $white: hsl(0%, 0%, 100%);
@@ -37,6 +39,7 @@ $family-sans-serif: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxyge
 // $input-shadow: none;
 // $navbar-item-color: $pink;
 // $modal-content-width: auto;
+$navbar-breakpoint: $tablet;
 
 // Import only what you need from Bulma
 @import '~bulma/sass/utilities/_all.sass';

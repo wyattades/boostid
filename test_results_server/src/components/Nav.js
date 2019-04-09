@@ -35,17 +35,17 @@ class Nav extends React.PureComponent {
   // }
 
   render() {
-    const [ bucket, project, test ] = this.props.location.pathname.slice(1).split('/');
-    const { open, mode } = this.state;
+    const [ , project, test ] = this.props.location.pathname.slice(1).split('/'); // HACK
+    const { open } = this.state;
 
-    const ci = bucket === 'ci';
+    // const ci = bucket === 'ci';
 
     return (
       <nav className={`navbar is-fixed-top is-primary`}>
         <div className="container">
           <div className="navbar-brand">
             <NavLink className="navbar-item has-text-weight-bold is-family-monospace is-size-5" exact to="/" style={{ display: 'block', lineHeight: '100%' }}>
-              <span style={{  }}>Boostid</span><br/><span className="is-size-7">Test Results</span>
+              <span>Boostid</span><br/><span className="is-size-7">Test Results</span>
             </NavLink>
             <div className={`navbar-burger burger ${open ? 'is-active' : ''}`}
               onClick={this.toggle} role="button" tabIndex="0">
@@ -56,18 +56,16 @@ class Nav extends React.PureComponent {
           </div>
           <div className={`navbar-menu ${open ? 'is-active' : ''}`}>
             <div className="navbar-start">
-              { bucket && bucket !== 'auth' && (
-                <NavLink className="navbar-item" exact to={`/${bucket}`}>
-                  {ci ? 'CI Projects' : <>Bucket:&nbsp;<strong>{bucket}</strong></>}
-                </NavLink>
-              )}
+              <NavLink className="navbar-item" exact to="/ci">
+                CI Projects
+              </NavLink>
               { project && (
-                <NavLink className="navbar-item" exact to={`/${bucket}/${project}`}>
-                  Project:&nbsp;<strong>{ci ? decodeURIComponent(project) : project}</strong>
+                <NavLink className="navbar-item" exact to={`/ci/${project}`}>
+                  Project:&nbsp;<strong>{decodeURIComponent(project)}</strong>
                 </NavLink>
               )}
               { test && (
-                <NavLink className="navbar-item"exact to={`/${bucket}/${project}/${test}`}>
+                <NavLink className="navbar-item"exact to={`/ci/${project}/${test}`}>
                   Test:&nbsp;<strong>{test}</strong>
                 </NavLink>
               )}

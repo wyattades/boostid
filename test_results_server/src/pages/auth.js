@@ -22,7 +22,7 @@ export default class Auth extends React.Component {
     super(props);
 
     this.state = {
-      awsAuth: api.getAuth(),
+      // awsAuth: api.getAuth(),
       ciAuth: api.getAuth('ci'),
       error: null,
       from: '/',
@@ -42,19 +42,19 @@ export default class Auth extends React.Component {
   //     this.props.history.push(`/${val}`);
   // }
 
-  awsLogin = (e) => {
-    const [ accessKeyId, secretAccessKey ] = parseSubmit(e);
+  // awsLogin = (e) => {
+  //   const [ accessKeyId, secretAccessKey ] = parseSubmit(e);
 
-    api.login({ accessKeyId, secretAccessKey });
+  //   api.login({ accessKeyId, secretAccessKey });
 
-    this.setState({ awsAuth: api.getAuth() });
-  }
+  //   this.setState({ awsAuth: api.getAuth() });
+  // }
 
-  awsLogout = () => {
-    api.logout();
+  // awsLogout = () => {
+  //   api.logout();
 
-    this.setState({ awsAuth: null });
-  }
+  //   this.setState({ awsAuth: null });
+  // }
 
   ciLogin = (e) => {
     const [ token ] = parseSubmit(e);
@@ -71,7 +71,7 @@ export default class Auth extends React.Component {
   }
   
   render() {
-    const { awsAuth, ciAuth, error } = this.state;
+    const { ciAuth, error } = this.state;
 
     return (
       <>
@@ -79,7 +79,7 @@ export default class Auth extends React.Component {
         { error && (
           <p className="notification is-danger">
             { error === 'Unauthorized'
-              ? 'You must provide either AWS or CircleCI credentials before you can view Boostid Test Results'
+              ? 'You must provide CircleCI credentials before you can view Boostid Test Results'
               : `An unexpected error occurred: ${error}. See the console for more details`
             }
           </p>
@@ -97,7 +97,7 @@ export default class Auth extends React.Component {
           </div>
         </form> */}
 
-        <form onSubmit={this.awsLogin} className="box" style={{ position: 'relative' }}>
+        {/* <form onSubmit={this.awsLogin} className="box" style={{ position: 'relative' }}>
           <h2 className="is-size-4">AWS Credentials</h2>
           <br/>
           { awsAuth ? (
@@ -121,13 +121,13 @@ export default class Auth extends React.Component {
               </div>
             </>
           )}
-        </form>
+        </form> */}
 
-        <form onSubmit={this.ciLogin} className="box" style={{ position: 'relative' }}>
+        <form name="ci-auth" onSubmit={this.ciLogin} className="box" style={{ position: 'relative' }}>
           <h2 className="is-size-4">CircleCI User Token</h2>
           { ciAuth ? (
             <>
-              <p className="has-text-grey">Saved credentials with CI Token: {ciAuth.token}</p>
+              <p className="has-text-grey">Saved credentials with CI Token: <span>{ciAuth.token.substring(0, 6)}...</span></p>
               <button type="button" className="button is-danger is-outlined" style={{ position: 'absolute', top: 20, right: 20 }}
                 onClick={this.ciLogout}>Clear Credentials</button>
             </>
@@ -137,7 +137,7 @@ export default class Auth extends React.Component {
               <br/>
               <div className="field">
                 <label className="label">Token</label>
-                <input type="text" className="input" required/>
+                <input type="password" className="input" pattern="[A-Za-z0-9_-]{10,}" title="Must be a valid CircleCI token" required/>
               </div>
               <div className="field">
                 <button type="submit" className="button is-success">Save</button>

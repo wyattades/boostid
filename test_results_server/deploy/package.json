@@ -1,10 +1,9 @@
 {
   "scripts": {
     "serve": "NODE_ENV=development nodemon api",
-    "deploy": "cp ../dist/* . && now --target production; rm index.* && now rm boostid -y --safe"
+    "deploy": "cp ../dist/* . && now --target production; rm index.* && rm *.png && now rm boostid -y --safe"
   },
   "dependencies": {
-    "aws-sdk": "^2.433.0",
     "express": "^4.16.4",
     "superagent": "^5.0.2"
   },

@@ -4,7 +4,8 @@
   "version": 2,
   "builds": [
     { "src": "api.js", "use": "@now/node-server" },
-    { "src": "index.*", "use": "@now/static" }
+    { "src": "index.*", "use": "@now/static" },
+    { "src": "*.png", "use": "@now/static" }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "api.js" },

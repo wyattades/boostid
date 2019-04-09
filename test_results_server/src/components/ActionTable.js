@@ -31,14 +31,16 @@ export default class ActionTable extends React.PureComponent {
   }
 
   renderRow = (row, i) => {
-    const { columns } = this.props;
+    const { columns, actions } = this.props;
     const { checked } = this.state;
 
     return (
       <tr key={i}>
-        <td onMouseDown={this.onMouseDown(i)} onMouseEnter={this.onOver(i)} className="no-select">
-          <input type="checkbox" checked={checked[i]} onChange={this.onCheck(i)}/>
-        </td>
+        { actions.length ? (
+          <td onMouseDown={this.onMouseDown(i)} onMouseEnter={this.onOver(i)} className="no-select">
+            <input type="checkbox" checked={checked[i]} onChange={this.onCheck(i)}/>
+          </td>
+        ) : null}
         {columns.map((column, i) => (
           <td key={column}>{(i === 0 && row._link) ? (<Link to={row._link}>{row[column]}</Link>) : row[column]}</td>
         ))}
@@ -140,9 +142,11 @@ export default class ActionTable extends React.PureComponent {
         <table className="table">
           <thead>
             <tr>
-              <th>
-                <input type="checkbox" checked={allTrue} onChange={this.toggleCheckAll}/>
-              </th>
+              { actions.length ? (
+                <th>
+                  <input type="checkbox" checked={allTrue} onChange={this.toggleCheckAll}/>
+                </th>
+              ) : null}
               {columns.map((column) => (
                 <th className="is-capitalized" key={column}>{column}</th>
               ))}

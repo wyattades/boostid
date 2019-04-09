@@ -17,6 +17,7 @@ module.exports = require('webpack-boiler')({
   react: true,
   pages: [{
     title: 'Boostid Results',
+    favicon: './src/images/favicon.png',
   }],
   // googleAnalytics: 'UA-105229811-4',
 });

@@ -28,7 +28,7 @@ NavLink.defaultProps.activeClassName = 'is-active';
 
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={(props) => api.getAuth(/^\/ci(\/|$)/.test(props.location.pathname) ? 'ci' : 'aws') ? <Component {...props} /> : (
+  <Route {...rest} render={(props) => api.getAuth() ? <Component {...props} /> : (
     <Redirect to={{
       pathname: '/auth',
       search: `?error=Unauthorized&from=${encodeURIComponent(props.location.pathname)}`,
@@ -48,9 +48,9 @@ const App = () => (
           <Switch>
             <Route exact path="/" component={Index} />
             <Route exact path="/auth" component={Auth}/>
-            <PrivateRoute exact path="/:bucket" component={Projects}/>
-            <PrivateRoute exact path="/:bucket/:project" component={Tests}/>
-            <PrivateRoute exact path="/:bucket/:project/:test" component={Results}/>
+            <PrivateRoute exact path="/ci" component={Projects}/>
+            <PrivateRoute exact path="/ci/:project" component={Tests}/>
+            <PrivateRoute exact path="/ci/:project/:test" component={Results}/>
             <Route exact path="/logout" render={() => {
               api.logout();
               return <Redirect to="/" />;

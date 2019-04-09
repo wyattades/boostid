@@ -5,9 +5,7 @@ import * as api from '../api';
 import ActionTable from '../components/ActionTable';
 
 
-const COLUMNS = ['id', 'time'];
-
-const ACTIONS = [];
+const COLUMNS = ['id', 'time', 'status'];
 
 export default class Tests extends React.PureComponent {
 
@@ -22,16 +20,15 @@ export default class Tests extends React.PureComponent {
 
   async fetchTests() {
     const params = this.props.match.params;
-    const { bucket, project } = params;
+    const { project } = params;
 
     try {
       let tests = await api.getTests(params);
 
-      tests = tests.map(({ id, time }) => ({
-        id,
-        time,
-        _link: `/${bucket}/${project}/${id}`,
-      }));
+      for (const testData of tests) {
+        testData._link = `/ci/${project}/${testData.id}`;
+        testData.status = <span className={`tag is-${testData.status === 'success' ? 'success' : 'danger'}`}>{testData.status}</span>;
+      }
 
       this.setState({
         tests,
@@ -43,19 +40,20 @@ export default class Tests extends React.PureComponent {
     }
   }
 
-  deleteRows = (rows) => {
-    const { bucket, project } = this.props.match.params;
+  // deleteRows = (rows) => {
+  //   const { bucket, project } = this.props.match.params;
 
-    return api.deleteTests({ bucket, project }, rows.map((row) => row.id))
-    .then(() => this.fetchTests())
-    .catch((err) => {
-      console.error(err);
-      window.alert('Failed to delete objects');
-    });
-  }
+  //   return api.deleteTests({ bucket, project }, rows.map((row) => row.id))
+  //   .then(() => this.fetchTests())
+  //   .catch((err) => {
+  //     console.error(err);
+  //     window.alert('Failed to delete objects');
+  //   });
+  // }
 
   render() {
     const { error, tests } = this.state;
+    // const { bucket } = this.props.match.params;
 
     if (error) throw error;
 
@@ -66,11 +64,7 @@ export default class Tests extends React.PureComponent {
         <div className="box">        
           <h1 className="is-size-4">Tests</h1>
           <br/>
-          <ActionTable data={tests} columns={COLUMNS} actions={[{
-            name: 'Delete Selected',
-            fn: this.deleteRows,
-            className: 'is-danger',
-          }]}/>
+          <ActionTable data={tests} columns={COLUMNS} actions={[]}/>
           {/* <ol>
             {tests.map(({ id, time }, i) => (
               <li key={id}><Link to={`/${bucket}/${project}/${id}`}>{id}</Link> ({new Date(time).toLocaleString()})</li>

@@ -23,11 +23,10 @@ export default class Results extends React.PureComponent {
     const params = this.props.match.params;
 
     try {
-      const { json, diffFiles } = await api.getResults(params);
+      const results = await api.getResults(params);
 
       this.setState({
-        json,
-        diffFiles
+        results,
       });
     } catch (error) {
       this.setState({ error });
@@ -37,14 +36,14 @@ export default class Results extends React.PureComponent {
   }
 
   render() {
-    const { error, json, diffFiles } = this.state;
+    const { error, results } = this.state;
 
     if (error) throw error;
 
-    if (!json) return <p>Loading...</p>;
+    if (!results) return <p>Loading...</p>;
 
     // const { project, bucket, test } = this.props.match.params;
-    const { timestamp, ciUrl, ciJob, testResults } = json;
+    const { timestamp, ciUrl, ciJob, ciStatus, testResults, diffFiles } = results;
 
     return (
       <>
@@ -52,16 +51,22 @@ export default class Results extends React.PureComponent {
 
         {timestamp ? <p><strong>Timestamp:</strong> {new Date(timestamp).toUTCString()}</p> : null}
         {ciJob ? <p><strong>CI Job:</strong> <a href={ciUrl}>{ciJob}</a></p> : null}
+        {ciStatus ? (
+          <p>
+            <strong>Status:</strong>&nbsp;
+            <span className={`tag is-${ciStatus === 'success' ? 'success' : 'danger'} has-text-capitalized`}>{ciStatus}</span>
+          </p>
+        ) : null}
         <hr/>
         <h2 className="is-size-4">Test File Results:</h2>
         <br/>
-        {testResults.testResults.map(({ name, message }) => (
+        {testResults ? testResults.map(({ name, message }) => (
           <div key={name}>
             <p style={{ marginBottom: 8 }} className={message ? 'has-text-danger' : 'has-text-success'}>{name}</p>
             {message ? <pre dangerouslySetInnerHTML={{ __html: ansiToHtml.toHtml(message) }}/> : null}
             <br/>
           </div>
-        ))}
+        )) : <p className="has-text-danger">No test results found</p>}
         <hr/>
         <h2 className="is-size-4">Visual Regression Mismatches:</h2>
         <p>{diffFiles.length} Mismatches</p>

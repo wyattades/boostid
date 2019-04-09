@@ -34,7 +34,7 @@ export default class Projects extends React.PureComponent {
 
     if (!projects) return <p>Loading...</p>;
 
-    const { bucket } = this.props.match.params;
+    // const { bucket } = this.props.match.params;
 
     return (
       <>
@@ -55,15 +55,15 @@ export default class Projects extends React.PureComponent {
                   <td>
                     {p.status && (
                       p.status === 'passing'
-                        ? <span class="tag is-success">Passing</span>
-                        : <span class="tag is-danger">Failing</span>
+                        ? <span className="tag is-success">Passing</span>
+                        : <span className="tag is-danger">Failing</span>
                     )}
                   </td>
                   <td>
                     {new Date(p.time).toLocaleString()}
                   </td>
                   <td>
-                    <Link to={`/${bucket}/${p.id}`}>{p.label}</Link>
+                    <Link to={`/ci/${p.id}`}>{p.label}</Link>
                   </td>
                 </tr>
               ))}

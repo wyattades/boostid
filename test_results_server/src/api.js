@@ -1,11 +1,11 @@
-import * as aws from './aws';
+// import * as aws from './aws';
 import * as ci from './ci';
 
 
-const api = {
-  aws,
-  ci,
-};
+// const api = {
+//   aws,
+//   ci,
+// };
 
 // const auth = {
 //   aws: null,
@@ -23,34 +23,36 @@ const api = {
 // export const getMode = () => mode;
 
 export const init = () => {
-  for (const type in api) {
+  // for (const type in api) {
     try {
-      const _auth = JSON.parse(window.localStorage.getItem(`boostid_${type}_auth`));
+      const _auth = JSON.parse(window.localStorage.getItem(`boostid_ci_auth`));
       if (_auth && typeof _auth === 'object') {
-        login(_auth, type);
+        login(_auth);
       }
     } catch (_) {}
-  }
+  // }
 };
 
 
-export const login = async (_auth, type = 'aws') => {
-  if (api[type].login(_auth)) {
+export const login = async (_auth) => {
+  if (ci.login(_auth)) {
     // api[type].auth = _auth;
-    window.localStorage.setItem(`boostid_${type}_auth`, JSON.stringify(_auth));
+    window.localStorage.setItem(`boostid_ci_auth`, JSON.stringify(_auth));
   }
 };
 
-export const logout = (type = 'aws') => {
-  api[type].logout();
-  window.localStorage.removeItem(`boostid_${type}_auth`);
+export const logout = () => {
+  ci.logout();
+  window.localStorage.removeItem(`boostid_ci_auth`);
 };
 
-export const getAuth = (type = 'aws') => api[type].auth;
+export const getAuth = () =>ci.auth;
 
-export const getBuckets = (type = 'aws') => api[type].getBuckets();
 
-export const getProjects = (params) => api[params.bucket === 'ci' ? 'ci' : 'aws'].getProjects(params);
-export const getTests = (params) => api[params.bucket === 'ci' ? 'ci' : 'aws'].getTests(params);
-export const getResults = (params) => api[params.bucket === 'ci' ? 'ci' : 'aws'].getResults(params);
-export const deleteTests = (params, tests) => api[params.bucket === 'ci' ? 'ci' : 'aws'].deleteTests(params, tests);
+
+export const getBuckets = () => ci.getBuckets();
+
+export const getProjects = (params) => ci.getProjects(params);
+export const getTests = (params) => ci.getTests(params);
+export const getResults = (params) => ci.getResults(params);
+export const deleteTests = (params, tests) => ci.deleteTests(params, tests);
