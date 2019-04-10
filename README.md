@@ -90,9 +90,13 @@ You can run your tests locally in a number of ways:
   ```bash
   boostid test
   ```
-- On the current machine i.e. without Docker. You can also set environment variable `BOOSTID_DEV=true` to enable non-headless mode, so you can watch the tests as they run.
+- On the current machine i.e. without Docker.
   ```bash
   boostid test --no-docker
+  ```
+- On the current machine i.e. without Docker, AND Chromium runs in non-headless mode, so you can watch the tests as they run.
+  ```bash
+  boostid test --dev
   ```
 - Using CircleCI CLI (requires the official CircleCI CLI and Docker to be installed)
   ```bash
@@ -102,15 +106,21 @@ You can run your tests locally in a number of ways:
 
 ## Testing with Jest and Puppeteer
 
-Any `.js` files in the `__tests__` directory of your project will be run as [Jest tests](https://jestjs.io/docs/en/getting-started).
+Any `.js` files in the `__tests__` directory of your project will be run as [Jest tests](https://jestjs.io/docs/en/getting-started). This means that you must use test mock functions to create your tests. In Jest, those are: `beforeAll`, `beforeEach` `describe`, `test`, etc.
 
 A few Puppeteer global variables are provided for convenience: `browser`, `context`, and a default `page` (See [jest-puppeteer-environment](https://www.npmjs.com/package/jest-environment-puppeteer)).
 
-Note: You can disable the default Puppeteer environment by adding the following docblock to the top of your test file:
+Also the global function `expect` allows you to create assertions in the test. See the [expect documentation](https://github.com/mjackson/expect) and [expect Puppeteer documentation](https://github.com/smooth-code/jest-puppeteer/tree/master/packages/expect-puppeteer) (which adds some convenience methods like `expect(page).toMatch('Some string that should show up on the page')`).
+
+Finally, Boostid provides numerous helper functions in the `tests` directory. Example:
 ```js
-/**
- * @jest-environment node
- */
+const tests = require('boostid/tests');
+
+test('My test', async () => {
+  await tests.submitForm('#form-selector', {
+    name: 'value',
+  });
+});
 ```
 
 
