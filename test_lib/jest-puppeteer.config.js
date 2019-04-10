@@ -4,6 +4,7 @@ module.exports = {
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   },
   browserContext: 'incognito',
+  exitOnPageError: false,
 };
 
 if (process.env.BOOSTID_DEV) {

@@ -38,16 +38,20 @@ const commands = [{
   // .default('type', 'all')
   .usage(`boostid test\n\nRun coverage tests locally in a Docker container\n\n\
 By default, save test results locally in the directory "__boostid_results__"`)
-  .option('s3', {
-    desc: 'Upload results to AWS S3 bucket',
-    type: 'boolean',
-  })
+  // .option('s3', {
+  //   desc: 'Upload results to AWS S3 bucket',
+  //   type: 'boolean',
+  // })
   .option('no-save', {
     desc: 'Don\'t save test results locally',
     type: 'boolean',
   })
   .option('no-docker', {
     desc: 'Don\'t run tests using Docker',
+    type: 'boolean',
+  })
+  .option('dev', {
+    desc: 'Run Chromium in non-headless mode, so you can see the tests as they run. This also disables Docker',
     type: 'boolean',
   })
   .option('dev-boostid', {
@@ -60,7 +64,7 @@ By default, save test results locally in the directory "__boostid_results__"`)
 }, {
   command: 'config',
   desc: 'Read and write global config',
-  example: 'boostid config-get session.user_id',
+  example: 'boostid config get session.user_id',
   builder: (_yargs) => _yargs
   .demandCommand(1, '')
   .example('boostid config get aws.my_bucket.accessKey')
